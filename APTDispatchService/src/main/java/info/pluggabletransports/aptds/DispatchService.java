@@ -4,10 +4,11 @@ import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.jrummyapps.android.shell.CommandResult;
+import com.jrummyapps.android.shell.Shell;
 
 import java.io.File;
 
@@ -69,7 +70,13 @@ public class DispatchService extends Service implements DispatchConstants {
         int port = -1;
 
         //start transport here
-        
+
+        //call the piedispatcher command line here
+        String cmd = "piedispacthcher --type=" + type;
+        CommandResult shellResult = Shell.run(cmd);
+        shellResult.isSuccessful();
+
+
         return port;
     }
 
@@ -119,11 +126,7 @@ public class DispatchService extends Service implements DispatchConstants {
             reply.setPackage(packageName);
             sendBroadcast(reply);
         }
-        else
-        {
-            LocalBroadcastManager.getInstance(this).sendBroadcast(reply);
 
-        }
 
     }
 }
