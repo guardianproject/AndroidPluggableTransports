@@ -8,6 +8,8 @@ import android.content.Intent;
 
 public interface DispatchConstants {
 
+    public final static String TAG = "APTDS";
+
     /**
      * A request to Orbot to transparently start Tor services
      */
@@ -41,14 +43,19 @@ public interface DispatchConstants {
     public final static String EXTRA_HTTP_PROXY_PORT = "info.pluggabletransports.aptds.intent.extra.HTTP_PROXY_PORT";
 
     /**
-     * All tor-related services and daemons are stopped
+     * All related services and daemons are stopped
      */
     public final static String STATUS_OFF = "OFF";
     /**
-     * All tor-related services and daemons have completed starting
+     * All related services and daemons have completed starting
      */
     public final static String STATUS_ON = "ON";
     public final static String STATUS_STARTING = "STARTING";
     public final static String STATUS_STOPPING = "STOPPING";
+
+    public final static int FILE_WRITE_BUFFER_SIZE = 2048;
+
+    public final static String DIRECTORY_BINARIES = "bin";
+
 
 }

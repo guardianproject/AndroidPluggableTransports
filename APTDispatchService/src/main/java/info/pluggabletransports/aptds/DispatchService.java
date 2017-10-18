@@ -1,11 +1,17 @@
 package info.pluggabletransports.aptds;
 
+import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+
+import java.io.File;
+
+import info.pluggabletransports.aptds.util.ResourceInstaller;
 
 /**
  * Created by n8fr8 on 10/18/17.
@@ -15,6 +21,8 @@ public class DispatchService extends Service implements DispatchConstants {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        initBinaries();
     }
 
     @Override
@@ -33,6 +41,21 @@ public class DispatchService extends Service implements DispatchConstants {
         return null;
     }
 
+    private void initBinaries ()
+    {
+        File appBinHome = getDir(DIRECTORY_BINARIES, Application.MODE_PRIVATE);
+        ResourceInstaller installer = new ResourceInstaller(this, appBinHome);
+
+        try {
+            String arch = "armeabi-v7a";
+            String runtime = "pidispatcher.armv7";
+            installer.installResource('/' + arch + '/' + runtime, false);
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG,"Unable to install dispatcher binaries",e);
+        }
+    }
     /**
      * Send Orbot's status in reply to an
      * {@link DispatchConstants#ACTION_START} {@link Intent}, targeted only to
