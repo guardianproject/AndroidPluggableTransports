@@ -27,7 +27,50 @@ public class DispatchService extends Service implements DispatchConstants {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        new Thread(new IncomingIntentRouter(intent)).start();
+
         return super.onStartCommand(intent, flags, startId);
+
+    }
+
+    private class IncomingIntentRouter implements Runnable
+    {
+        Intent mIntent;
+
+        public IncomingIntentRouter (Intent intent)
+        {
+            mIntent = intent;
+        }
+
+        public void run() {
+
+            String action = mIntent.getAction();
+
+            if (action != null) {
+                if (action.equals(ACTION_START)) {
+
+                    String transportType = mIntent.getStringExtra(EXTRA_TRANSPORT_TYPE);
+
+                    //launch transport here
+                    int transportPort = startTransport (transportType);
+
+                    replyWithStatus(mIntent,STATUS_ON,transportType,transportPort);
+                }
+                else if (action.equals(ACTION_STATUS)) {
+                   // replyWithStatus(mIntent,STATUS_ON,"http",1234);
+                }
+            }
+        }
+    }
+
+    private int startTransport (String type)
+    {
+        int port = -1;
+
+        //start transport here
+        
+        return port;
     }
 
     @Override
@@ -62,23 +105,14 @@ public class DispatchService extends Service implements DispatchConstants {
      * the app that sent the initial request. If the user has disabled auto-
      * starts, the reply {@code ACTION_START Intent} will include the extra
      */
-    private void replyWithStatus(Intent startRequest, int status, int socksPort, int httpPort) {
+    private void replyWithStatus(Intent startRequest, String status, String type, int port) {
+
         String packageName = startRequest.getStringExtra(EXTRA_PACKAGE_NAME);
 
         Intent reply = new Intent(ACTION_STATUS);
         reply.putExtra(EXTRA_STATUS, status);
-
-        if (socksPort != -1) {
-            reply.putExtra(EXTRA_SOCKS_PROXY, "socks://127.0.0.1:" + socksPort);
-            reply.putExtra(EXTRA_SOCKS_PROXY_HOST, "127.0.0.1");
-            reply.putExtra(EXTRA_SOCKS_PROXY_PORT, socksPort);
-        }
-
-        if (httpPort != -1) {
-            reply.putExtra(EXTRA_HTTP_PROXY, "http://127.0.0.1" + httpPort);
-            reply.putExtra(EXTRA_HTTP_PROXY_HOST, "127.0.0.1");
-            reply.putExtra(EXTRA_HTTP_PROXY_PORT, httpPort);
-        }
+        reply.putExtra(EXTRA_TRANSPORT_TYPE, type);
+        reply.putExtra(EXTRA_TRANSPORT_PORT, port);
 
         if (packageName != null)
         {

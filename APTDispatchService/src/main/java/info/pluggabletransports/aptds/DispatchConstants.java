@@ -32,15 +32,8 @@ public interface DispatchConstants {
     /**
      * The SOCKS proxy settings in URL form.
      */
-    public final static String EXTRA_SOCKS_PROXY = "info.pluggabletransports.aptds.intent.extra.SOCKS_PROXY";
-    public final static String EXTRA_SOCKS_PROXY_HOST = "info.pluggabletransports.aptds.intent.extra.SOCKS_PROXY_HOST";
-    public final static String EXTRA_SOCKS_PROXY_PORT = "info.pluggabletransports.aptds.intent.extra.SOCKS_PROXY_PORT";
-    /**
-     * The HTTP proxy settings in URL form.
-     */
-    public final static String EXTRA_HTTP_PROXY = "info.pluggabletransports.aptds.intent.extra.HTTP_PROXY";
-    public final static String EXTRA_HTTP_PROXY_HOST = "info.pluggabletransports.aptds.intent.extra.HTTP_PROXY_HOST";
-    public final static String EXTRA_HTTP_PROXY_PORT = "info.pluggabletransports.aptds.intent.extra.HTTP_PROXY_PORT";
+    public final static String EXTRA_TRANSPORT_TYPE = "info.pluggabletransports.aptds.intent.extra.PROXY_TYPE";
+    public final static String EXTRA_TRANSPORT_PORT = "info.pluggabletransports.aptds.intent.extra.PROXY_PORT";
 
     /**
      * All related services and daemons are stopped
