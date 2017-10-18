@@ -1,5 +1,6 @@
 package info.pluggabletransports.aptds;
 
+import android.annotation.TargetApi;
 import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import com.jrummyapps.android.shell.Shell;
 import java.io.File;
 
 import info.pluggabletransports.aptds.util.ResourceInstaller;
+import info.pluggabletransports.aptds.vpn.DispatchVPN;
 
 /**
  * Created by n8fr8 on 10/18/17.
@@ -52,9 +54,13 @@ public class DispatchService extends Service implements DispatchConstants {
                 if (action.equals(ACTION_START)) {
 
                     String transportType = mIntent.getStringExtra(EXTRA_TRANSPORT_TYPE);
+                    boolean transportVPN = mIntent.getBooleanExtra(EXTRA_TRANSPORT_VPN, false);
 
                     //launch transport here
                     int transportPort = startTransport (transportType);
+
+                    if (transportVPN)
+                        startVPN(transportPort);
 
                     replyWithStatus(mIntent,STATUS_ON,transportType,transportPort);
                 }
@@ -128,5 +134,20 @@ public class DispatchService extends Service implements DispatchConstants {
         }
 
 
+    }
+
+    private void startVPN (int socks)
+    {
+        Intent intentVpn = new Intent(this,DispatchVPN.class);
+        intentVpn.setAction("start");
+        intentVpn.putExtra("socks",socks);
+        startService(intentVpn);
+    }
+
+    public void stopVPN ()
+    {
+        Intent intentVpn = new Intent(this,DispatchVPN.class);
+        intentVpn.setAction("stop");
+        startService(intentVpn);
     }
 }

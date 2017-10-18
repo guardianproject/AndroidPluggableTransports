@@ -34,6 +34,8 @@ public interface DispatchConstants {
      */
     public final static String EXTRA_TRANSPORT_TYPE = "info.pluggabletransports.aptds.intent.extra.PROXY_TYPE";
     public final static String EXTRA_TRANSPORT_PORT = "info.pluggabletransports.aptds.intent.extra.PROXY_PORT";
+    public final static String EXTRA_TRANSPORT_VPN = "info.pluggabletransports.aptds.intent.extra.PROXY_VPN";
+
 
     /**
      * All related services and daemons are stopped
