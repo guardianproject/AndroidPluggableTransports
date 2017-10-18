@@ -1,4 +1,4 @@
-package info.pluggeabletransports.aptds;
+package info.pluggabletransports.aptds;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
