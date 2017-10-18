@@ -1,4 +1,4 @@
-package info.pluggeabletransports.dptds;
+package info.pluggeabletransports.aptds;
 
 import org.junit.Test;
 
