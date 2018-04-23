@@ -22,7 +22,7 @@ public class Dispatcher implements DispatchConstants {
 
     private void loadTransports ()
     {
-
+        //TODO: discover available transports here, and do what we need to get them ready
     }
 
     public Transport getTransport (String type)
