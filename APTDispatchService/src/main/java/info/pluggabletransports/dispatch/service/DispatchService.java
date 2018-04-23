@@ -72,13 +72,7 @@ public class DispatchService extends Service implements DispatchConstants {
     {
         int port = -1;
 
-        //start transport here
-
-        //call the piedispatcher command line here
-        String cmd = "piedispacthcher --type=" + type;
-        //CommandResult shellResult = Shell.run(cmd);
-        //shellResult.isSuccessful();
-
+       //call the dispatcher here?
 
         return port;
     }
