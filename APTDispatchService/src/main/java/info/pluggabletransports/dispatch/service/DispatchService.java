@@ -4,7 +4,6 @@ import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.File;
@@ -82,7 +81,6 @@ public class DispatchService extends Service implements DispatchConstants {
         return super.onUnbind(intent);
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
