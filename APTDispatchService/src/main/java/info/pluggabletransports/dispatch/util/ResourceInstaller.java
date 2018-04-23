@@ -1,10 +1,9 @@
 /* Copyright (c) 2009, Nathan Freitas, Orbot / The Guardian Project - http://openideals.com/guardian */
 /* See LICENSE for licensing information */
 
-package info.pluggabletransports.aptds.util;
+package info.pluggabletransports.dispatch.util;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 
 import java.io.DataInputStream;
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import info.pluggabletransports.aptds.DispatchConstants;
+import info.pluggabletransports.dispatch.DispatchConstants;
 
 public class ResourceInstaller implements DispatchConstants {
 

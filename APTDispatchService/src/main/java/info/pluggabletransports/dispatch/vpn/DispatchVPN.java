@@ -1,4 +1,4 @@
-package info.pluggabletransports.aptds.vpn;
+package info.pluggabletransports.dispatch.vpn;
 
 import android.net.VpnService;
 

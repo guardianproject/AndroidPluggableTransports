@@ -1,10 +1,12 @@
 
-package info.pluggabletransports.aptds;
+package info.pluggabletransports.dispatch.service;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+
+import info.pluggabletransports.dispatch.DispatchConstants;
 
 
 public class DispatchReceiver extends BroadcastReceiver implements DispatchConstants {

@@ -1,4 +1,4 @@
-package info.pluggabletransports.aptds;
+package info.pluggabletransports.dispatch;
 
 import android.content.Intent;
 
@@ -9,6 +9,26 @@ import android.content.Intent;
 public interface DispatchConstants {
 
     public final static String TAG = "APTDS";
+
+    /** Pluggable Transports 2.0 Spec Constants 3.3.1.1. Common Configuration Parameters**/
+
+    public final static String PT_VERSION = "ptversion"; //decimal //Specify the Pluggable Transport protocol version to use
+    public final static String PT_STATE_DIRECTORY = "state"; //string path or file // Specify the directory to use to store state information required by the transports
+    public final static String PT_EXIT_ON_STDIN_CLOSE = "exit-on-stdin-close"; //boolean // Set to true to force the dispatcher to close when the stdin pipe is closed
+
+    // NOTE: -transports is parsed as a common command line flag that overrides either TOR_PT_SERVER_TRANSPORTS or TOR_PT_CLIENT_TRANSPORTS
+    public final static String PT_TRANSPORTS = "transports"; //string transport name // Specify transports to enable
+
+    // PT 2.0 specification, 3.3.1.2. Pluggable PT Client Configuration Parameters
+    public final static String PT_CLIENT_UPSTREAM_PROXy = "proxy";
+
+    // PT 2.0 specification, 3.3.1.3. Pluggable PT Server Environment Variables
+    public final static String PT_SERVER_OPTIONS = "options"; //Specify the transport options for the server
+    public final static String PT_SERVER_BIND_ADDR = "bindaddr"; //Specify the bind address for transparent server
+    public final static String PT_SERVER_OR_PORT = "orport"; //Specify the address the server should forward traffic to in host:port format
+    public final static String PT_SERVER_EXT_OR_PORT = "extorport"; //    Specify the address of a server implementing the Extended OR Port protocol, which is used for per-connection metadata
+    public final static String PT_SERVER_AUTH_COOKIE = "authcookie"; //   Specify an authentication cookie, for use in authenticating with the Extended OR Port
+    public final static String PT_SERVER_PROXY_LISTEN_ADDR = "proxylistenaddr"; //Specify the bind address for the local SOCKS server provided by the client
 
     /**
      * A request to Orbot to transparently start Tor services
@@ -51,6 +71,7 @@ public interface DispatchConstants {
     public final static int FILE_WRITE_BUFFER_SIZE = 2048;
 
     public final static String DIRECTORY_BINARIES = "bin";
+
 
 
 }

@@ -1,6 +1,5 @@
-package info.pluggabletransports.aptds;
+package info.pluggabletransports.dispatch.service;
 
-import android.annotation.TargetApi;
 import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
@@ -8,13 +7,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.jrummyapps.android.shell.CommandResult;
-import com.jrummyapps.android.shell.Shell;
-
 import java.io.File;
 
-import info.pluggabletransports.aptds.util.ResourceInstaller;
-import info.pluggabletransports.aptds.vpn.DispatchVPN;
+import info.pluggabletransports.dispatch.DispatchConstants;
+import info.pluggabletransports.dispatch.util.ResourceInstaller;
+import info.pluggabletransports.dispatch.vpn.DispatchVPN;
 
 /**
  * Created by n8fr8 on 10/18/17.
@@ -79,8 +76,8 @@ public class DispatchService extends Service implements DispatchConstants {
 
         //call the piedispatcher command line here
         String cmd = "piedispacthcher --type=" + type;
-        CommandResult shellResult = Shell.run(cmd);
-        shellResult.isSuccessful();
+        //CommandResult shellResult = Shell.run(cmd);
+        //shellResult.isSuccessful();
 
 
         return port;
