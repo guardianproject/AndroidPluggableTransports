@@ -10,7 +10,6 @@ import java.io.File;
 
 import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.util.ResourceInstaller;
-import info.pluggabletransports.dispatch.vpn.DispatchVPN;
 
 /**
  * Created by n8fr8 on 10/18/17.

@@ -1,4 +1,4 @@
-package info.pluggabletransports.dispatch.vpn;
+package info.pluggabletransports.dispatch.service;
 
 import android.net.VpnService;
 

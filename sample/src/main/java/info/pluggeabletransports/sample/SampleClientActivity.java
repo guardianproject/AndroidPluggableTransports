@@ -2,6 +2,11 @@ package info.pluggeabletransports.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
@@ -15,11 +20,17 @@ public class SampleClientActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample_client);
 
-        String bridgeAddr = "some.endpoint.domain.fronting.com";
-        init (bridgeAddr);
+        try {
+            InetAddress bridgeAddr = Inet4Address.getByName("some.endpoint.domain.fronting.com");
+            init(bridgeAddr);
+        }
+        catch (UnknownHostException uhe)
+        {
+            Log.e(getClass().getName(),"Error finding host",uhe);
+        }
     }
 
-    public void init (String bridgeAddr)
+    public void init (InetAddress bridgeAddr)
     {
         Transport transport = Dispatcher.get().getTransport(DispatchConstants.PT_TRANSPORTS_MEEK);
 
