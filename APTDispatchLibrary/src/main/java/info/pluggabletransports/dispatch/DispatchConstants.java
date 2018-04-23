@@ -30,6 +30,13 @@ public interface DispatchConstants {
     public final static String PT_SERVER_AUTH_COOKIE = "authcookie"; //   Specify an authentication cookie, for use in authenticating with the Extended OR Port
     public final static String PT_SERVER_PROXY_LISTEN_ADDR = "proxylistenaddr"; //Specify the bind address for the local SOCKS server provided by the client
 
+    // APT-DS implemented transports
+    public final static String PT_TRANSPORTS_MEEK = "meek-lite";
+    public final static String PT_TRANSPORTS_OBFS4 = "obfs4";
+    public final static String PT_TRANSPORTS_SHADOWSOCKS = "ss";
+    public final static String PT_TRANSPORTS_SNOWFLAKE = "snowflake";
+
+
     /**
      * A request to Orbot to transparently start Tor services
      */

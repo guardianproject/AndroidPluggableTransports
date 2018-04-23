@@ -1,2 +1,2 @@
-include ':APTDispatchService'
+include ':APTDispatchLibrary'
 include ':sample'
