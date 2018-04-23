@@ -1,5 +1,7 @@
 package info.pluggabletransports.dispatch;
 
+import java.net.InetAddress;
+
 public interface Listener {
 
     //​ ​ Accept​ ​ waits​ ​ for​ ​ and​ ​ returns​ ​ the​ ​ next​ ​ connection​ ​ to​ ​ the​ ​ listener.
@@ -9,6 +11,6 @@ public interface Listener {
     public void close ();
 
     //​ ​ Addr​ ​ returns​ ​ the​ ​ listener's​ ​ network​ ​ address.
-    public String getAddress ();
+    public InetAddress getAddress ();
 
 }
