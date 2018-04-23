@@ -37,6 +37,9 @@ public class SampleClientActivity extends AppCompatActivity {
         if (transport != null)
         {
             Connection conn = transport.connect(bridgeAddr);
+
+            //now use the connection, either as a proxy, or to read and write bytes directly
+
         }
     }
 }
