@@ -20,7 +20,7 @@ public interface DispatchConstants {
     public final static String PT_TRANSPORTS = "transports"; //string transport name // Specify transports to enable
 
     // PT 2.0 specification, 3.3.1.2. Pluggable PT Client Configuration Parameters
-    public final static String PT_CLIENT_UPSTREAM_PROXy = "proxy";
+    public final static String PT_CLIENT_UPSTREAM_PROXY = "proxy";
 
     // PT 2.0 specification, 3.3.1.3. Pluggable PT Server Environment Variables
     public final static String PT_SERVER_OPTIONS = "options"; //Specify the transport options for the server
