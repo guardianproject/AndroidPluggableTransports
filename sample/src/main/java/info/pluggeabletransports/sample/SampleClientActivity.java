@@ -7,6 +7,7 @@ import android.util.Log;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Properties;
 
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
@@ -19,20 +20,20 @@ public class SampleClientActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample_client);
+        
+        Properties options = new Properties();
+        String bridgeAddr = "https://meek.actualdomain.com";
 
-        try {
-            InetAddress bridgeAddr = Inet4Address.getByName("some.endpoint.domain.fronting.com");
-            init(bridgeAddr);
-        }
-        catch (UnknownHostException uhe)
-        {
-            Log.e(getClass().getName(),"Error finding host",uhe);
-        }
+        options.put("front","www.somefrontabledomain.com");
+        options.put("key","18800CFE9F483596DDA6264C4D7DF7331E1E39CE");
+
+        init(bridgeAddr, options);
+
     }
 
-    public void init (InetAddress bridgeAddr)
+    public void init (String bridgeAddr, Properties options)
     {
-        Transport transport = Dispatcher.get().getTransport(DispatchConstants.PT_TRANSPORTS_MEEK);
+        Transport transport = Dispatcher.get().getTransport(DispatchConstants.PT_TRANSPORTS_MEEK, options);
 
         if (transport != null)
         {

@@ -1,5 +1,7 @@
 package info.pluggabletransports.dispatch;
 
+import java.util.Properties;
+
 import info.pluggabletransports.dispatch.transports.MeekTransport;
 import info.pluggabletransports.dispatch.transports.Obfs4Transport;
 
@@ -28,7 +30,7 @@ public class Dispatcher implements DispatchConstants {
         //TODO: discover available transports here, and do what we need to get them ready
     }
 
-    public Transport getTransport (String type)
+    public Transport getTransport (String type, Properties options)
     {
         Transport transport = null;
 
@@ -36,6 +38,9 @@ public class Dispatcher implements DispatchConstants {
             transport = new MeekTransport();
         else if (type.equals(PT_TRANSPORTS_OBFS4))
             transport = new Obfs4Transport();
+
+        if (transport != null)
+            transport.init(options);
 
         return transport;
     }
