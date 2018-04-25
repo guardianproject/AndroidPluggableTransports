@@ -18,11 +18,11 @@ public class DispatchReceiver extends BroadcastReceiver implements DispatchConst
         if (TextUtils.equals(action, ACTION_START)) {
             String packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME);
 
-                Intent startTorIntent = new Intent(context, DispatchService.class);
-                startTorIntent.setAction(action);
+                Intent startIntent = new Intent(context, DispatchService.class);
+                startIntent.setAction(action);
                 if (packageName != null)
-                    startTorIntent.putExtra(EXTRA_PACKAGE_NAME, packageName);
-                context.startService(startTorIntent);
+                    startIntent.putExtra(EXTRA_PACKAGE_NAME, packageName);
+                context.startService(startIntent);
 
         }
     }

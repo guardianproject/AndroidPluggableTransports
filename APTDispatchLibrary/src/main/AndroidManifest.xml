@@ -18,7 +18,7 @@
             android:enabled="true"
             android:stopWithTask="false"></service>
         <service
-            android:name="info.pluggabletransports.dispatch.service.vpn.DispatchVPN"
+            android:name="info.pluggabletransports.dispatch.service.DispatchVPN"
             android:enabled="true"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
