@@ -1,5 +1,7 @@
 package info.pluggabletransports.dispatch;
 
+import android.content.Context;
+
 import java.net.InetAddress;
 import java.util.Properties;
 
@@ -8,7 +10,7 @@ import java.util.Properties;
 public interface Transport {
 
     /** key, value pairs based on PT 2.0 spec options, or custom values for the particular transport **/
-    public abstract void init (Properties options);
+    public abstract void init (Context context, Properties options);
 
     /** Addr can be a host:port or other value dependent upon the transport needs **/
 //​ ​ Create​ ​ outgoing​ ​ transport​ ​ connection;​ The​ ​ Dial​ ​ method​ ​ implements​ ​ the​ ​ Client​ ​ Factory​ ​ abstract​ ​ interface.

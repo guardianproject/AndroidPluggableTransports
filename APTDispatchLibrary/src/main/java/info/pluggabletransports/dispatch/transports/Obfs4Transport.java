@@ -1,5 +1,7 @@
 package info.pluggabletransports.dispatch.transports;
 
+import android.content.Context;
+
 import java.net.InetAddress;
 import java.util.Properties;
 
@@ -10,7 +12,7 @@ import info.pluggabletransports.dispatch.Transport;
 public class Obfs4Transport implements Transport {
 
     @Override
-    public void init(Properties options) {
+    public void init(Context context, Properties options) {
 
     }
 
