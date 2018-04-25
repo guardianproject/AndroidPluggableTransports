@@ -1,5 +1,7 @@
 package info.pluggabletransports.dispatch;
 
+import android.content.Context;
+
 import java.util.Properties;
 
 import info.pluggabletransports.dispatch.transports.MeekTransport;
@@ -31,7 +33,7 @@ public class Dispatcher implements DispatchConstants {
         //TODO: discover available transports here, and do what we need to get them ready
     }
 
-    public Transport getTransport (String type, Properties options)
+    public Transport getTransport (Context context, String type, Properties options)
     {
         Transport transport = null;
 
@@ -43,7 +45,7 @@ public class Dispatcher implements DispatchConstants {
             transport = new ShadowSocksTransport();
 
         if (transport != null)
-            transport.init(options);
+            transport.init(context, options);
 
         return transport;
     }

@@ -34,7 +34,7 @@ public class SampleClientActivity extends AppCompatActivity {
 
     public void init (String type, String bridgeAddress, Properties options)
     {
-        Transport transport = Dispatcher.get().getTransport(type, options);
+        Transport transport = Dispatcher.get().getTransport(this, type, options);
 
         if (transport != null)
         {
