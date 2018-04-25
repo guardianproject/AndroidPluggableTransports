@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 
+
 android {
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
@@ -27,5 +28,5 @@ dependencies {
     })
     testImplementation 'junit:junit:4.12'
     implementation 'com.jrummyapps:android-shell:1.0.1'
-
+    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
 }

@@ -11,6 +11,7 @@ import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.util.TransportManager;
+import iobfs4proxy.Iobfs4proxy;
 
 public class MeekTransport implements Transport {
 
@@ -26,12 +27,19 @@ public class MeekTransport implements Transport {
     public void init(Context context, Properties options) {
 
         initMeekIPC(context);
+        initMeekSharedLibrary();
     }
 
     @Override
     public Connection connect(String addr) {
 
+        //for the IPC version
         mTransportManager.startTransport();
+
+        //for the in-process library
+        //calls obfs4 in the same thread, woot!
+        //Iobfs4proxy.main();
+
         return new MeekConnection();
     }
 
@@ -49,7 +57,7 @@ public class MeekTransport implements Transport {
 
     private void initMeekSharedLibrary ()
     {
-
+        //nothing to do here
     }
 
     class MeekConnection implements Connection {
