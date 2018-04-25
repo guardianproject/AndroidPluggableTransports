@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import info.pluggabletransports.dispatch.transports.MeekTransport;
 import info.pluggabletransports.dispatch.transports.Obfs4Transport;
+import info.pluggabletransports.dispatch.transports.ShadowSocksTransport;
 
 public class Dispatcher implements DispatchConstants {
 
@@ -38,6 +39,8 @@ public class Dispatcher implements DispatchConstants {
             transport = new MeekTransport();
         else if (type.equals(PT_TRANSPORTS_OBFS4))
             transport = new Obfs4Transport();
+        else if (type.equals(PT_TRANSPORTS_SHADOWSOCKS))
+            transport = new ShadowSocksTransport();
 
         if (transport != null)
             transport.init(options);
