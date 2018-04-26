@@ -13,7 +13,7 @@ import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.util.TransportManager;
 import iobfs4proxy.Iobfs4proxy;
 
-public class MeekTransport implements Transport {
+public class MeekTransport implements Transport, Runnable {
 
     public final static String OPTION_FRONT = "front";
     public final static String OPTION_KEY = "key";
@@ -23,10 +23,12 @@ public class MeekTransport implements Transport {
 
     private TransportManager mTransportManager;
 
+    private final static int DEFAULT_MEEK_SOCKS_PORT = 47352;
+
     @Override
     public void init(Context context, Properties options) {
 
-        initMeekIPC(context);
+       // initMeekIPC(context);
         initMeekSharedLibrary();
     }
 
@@ -34,13 +36,26 @@ public class MeekTransport implements Transport {
     public Connection connect(String addr) {
 
         //for the IPC version
-        mTransportManager.startTransport();
+        //mTransportManager.startTransport();
+
+        new Thread(this).start();
+
+        try {
+            return new MeekConnection(InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
+        } catch (IOException e)
+        {
+            return null;
+        }
+    }
+
+    public void run ()
+    {
+
+        //TODO: how do we pass in variables?
 
         //for the in-process library
         //calls obfs4 in the same thread, woot!
-        //Iobfs4proxy.main();
-
-        return new MeekConnection();
+        Iobfs4proxy.main();
     }
 
     @Override
@@ -62,16 +77,44 @@ public class MeekTransport implements Transport {
 
     class MeekConnection implements Connection {
 
+        private InetAddress mLocalAddress;
+        private int mLocalPort;
+
+        public MeekConnection (InetAddress localSocks, int port)
+        {
+            //init connection to local socks port
+            mLocalAddress = localSocks;
+            mLocalPort = port;
+        }
+
+        /**
+         * Read from socks socket
+         *
+         * @param b
+         * @param offset
+         * @param length
+         * @return
+         * @throws IOException
+         */
         @Override
         public int read(byte[] b, int offset, int length) throws IOException {
             return 0;
         }
 
+        /**
+         * Write to socks socket
+         *
+         * @param b
+         * @throws IOException
+         */
         @Override
         public void write(byte[] b) throws IOException {
 
         }
 
+        /**
+         * Close socks socket
+         */
         @Override
         public void close() {
 
@@ -79,12 +122,12 @@ public class MeekTransport implements Transport {
 
         @Override
         public InetAddress getLocalAddress() {
-            return null;
+            return mLocalAddress;
         }
 
         @Override
         public int getLocalPort() {
-            return 0;
+            return mLocalPort;
         }
 
         @Override

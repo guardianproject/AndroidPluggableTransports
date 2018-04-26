@@ -42,6 +42,14 @@ public class SampleClientActivity extends AppCompatActivity {
 
             //now use the connection, either as a proxy, or to read and write bytes directly
 
+            setSocksProxy (conn.getLocalAddress(), conn.getLocalPort());
+
+
         }
+    }
+
+    private void setSocksProxy (InetAddress localSocks, int socksPort)
+    {
+        //do what you need here to proxy
     }
 }
