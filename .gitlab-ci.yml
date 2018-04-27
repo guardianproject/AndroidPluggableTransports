@@ -1,0 +1,33 @@
+image: registry.gitlab.com/fdroid/ci-images-client:latest
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+before_script:
+  - export GRADLE_USER_HOME=$PWD/.gradle
+  - export ANDROID_COMPILE_SDK=`sed -n 's,.*compileSdkVersion\s*\([0-9][0-9]*\).*,\1,p' sample/build.gradle`
+  - echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
+
+# Run the most important first. Then we can decide whether to ignore
+# the style tests if the rest of the more meaningful tests pass.
+test:
+  script:
+    - export EXITVALUE=0
+    - ./gradlew assemble
+    # always report on lint errors to the build log
+    - sed -i -e 's,textReport .*,textReport true,' */build.gradle
+    - ./gradlew test || export EXITVALUE=1
+    - ./gradlew lint || export EXITVALUE=1
+    - exit $EXITVALUE
+
+errorprone:
+  script:
+    - cat config/errorprone.gradle >> app/build.gradle
+    - ./gradlew assembleDebug
+
+after_script:
+    # this file changes every time but should not be cached
+    - rm -f $GRADLE_USER_HOME/caches/modules-2/modules-2.lock
+    - rm -fr $GRADLE_USER_HOME/caches/*/plugin-resolution/
