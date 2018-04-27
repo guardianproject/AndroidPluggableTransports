@@ -14,6 +14,7 @@ import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.transports.MeekTransport;
+import info.pluggabletransports.dispatch.transports.sample.SampleTransport;
 
 public class SampleClientActivity extends AppCompatActivity {
 
@@ -57,7 +58,7 @@ public class SampleClientActivity extends AppCompatActivity {
     {
         String bridgeAddress = "somecrazyaddress";
         Properties options = new Properties();
-        options.put("password","thesecret");
+        options.put(SampleTransport.SAMPLE_SPECIAL_OPTION,"thesecret");
 
         Connection conn = init ("sample",bridgeAddress, options);
 

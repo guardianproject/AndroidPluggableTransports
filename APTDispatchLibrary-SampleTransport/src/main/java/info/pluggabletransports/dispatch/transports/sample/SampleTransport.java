@@ -18,6 +18,8 @@ public class SampleTransport implements Transport {
         Dispatcher.get().register("sample",getClass());
     }
 
+    public final static String SAMPLE_SPECIAL_OPTION = "option1";
+
     @Override
     public void init(Context context, Properties options) {
 
