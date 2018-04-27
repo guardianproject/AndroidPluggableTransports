@@ -1,9 +1,15 @@
 package info.pluggabletransports.dispatch.transports;
 
 import android.content.Context;
+import android.os.Build;
+import android.system.ErrnoException;
+import android.system.Os;
+import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.util.Date;
 import java.util.Properties;
 
@@ -22,9 +28,11 @@ public class MeekTransport implements Transport, Runnable {
     public final static String OPTION_KEY = "key";
     public final static String OPTION_URL = "url";
 
-    private final static String ASSET_KEY = "obfs4proxy";
-
     private final static int DEFAULT_MEEK_SOCKS_PORT = 47352;
+
+    private String mMeekFrontDomain;
+    private String mMeekKey;
+    private String mMeekUrl;
 
     {
         Dispatcher.get().register(PT_TRANSPORTS_MEEK,getClass());
@@ -33,7 +41,11 @@ public class MeekTransport implements Transport, Runnable {
     @Override
     public void init(Context context, Properties options) {
 
-        initMeekSharedLibrary();
+        initMeekSharedLibrary(context);
+
+        mMeekFrontDomain = options.getProperty(OPTION_FRONT);
+        mMeekKey = options.getProperty(OPTION_KEY);
+        mMeekUrl = options.getProperty(OPTION_URL);
     }
 
     @Override
@@ -45,7 +57,7 @@ public class MeekTransport implements Transport, Runnable {
         new Thread(this).start();
 
         try {
-            return new MeekConnection(InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
+            return new MeekConnection(addr, InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
         } catch (IOException e)
         {
             return null;
@@ -67,9 +79,39 @@ public class MeekTransport implements Transport, Runnable {
         return null;
     }
 
-    private void initMeekSharedLibrary ()
+    private void initMeekSharedLibrary (Context context)
     {
-        //nothing to do here
+
+        try
+        {
+            File filePtStateDir = new File(context.getCacheDir(),"ptstate");
+
+            if (!filePtStateDir.exists())
+                filePtStateDir.mkdirs();
+
+            setenv("TOR_PT_CLIENT_TRANSPORTS","meek");
+            //"obfs4,meek_lite,obfs2,obfs3,scramblesuit"
+
+            setenv("TOR_PT_EXIT_ON_STDIN_CLOSE","1");
+            setenv("TOR_PT_PROXY","");
+            setenv("TOR_PT_SERVER_TRANSPORTS","");
+            setenv("TOR_PT_MANAGED_TRANSPORT_VER","1");
+            setenv("TOR_PT_STATE_LOCATION",filePtStateDir.getAbsolutePath());
+
+        } catch (Exception e) {
+            Log.e(getClass().getName(),"Error setting env variables",e);
+        }
+
+    }
+
+    private void setenv (String key, String value) throws ErrnoException {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Os.setenv(key, value, true);
+        }
+        else
+        {
+            //what to do here for Pre-Lollipop devices?
+        }
     }
 
     class MeekConnection implements Connection {
@@ -77,11 +119,56 @@ public class MeekTransport implements Transport, Runnable {
         private InetAddress mLocalAddress;
         private int mLocalPort;
 
-        public MeekConnection (InetAddress localSocks, int port)
+        public MeekConnection (String bridgeAddr, InetAddress localSocks, int port)
         {
             //init connection to local socks port
             mLocalAddress = localSocks;
             mLocalPort = port;
+
+            initBridgeViaSocks ();
+        }
+
+        private void initBridgeViaSocks ()
+        {
+            //connect to SOCKS port and pass the values appropriately to configure meek
+            //see: https://gitweb.torproject.org/torspec.git/tree/pt-spec.txt#n628
+
+            /**
+             * 3.5. Pluggable Transport Client Per-Connection Arguments
+
+             Certain PT transport protocols require that the client provides
+             per-connection arguments when making outgoing connections.  On
+             the server side, this is handled by the "ARGS" optional argument
+             as part of the "SMETHOD" message.
+
+             On the client side, arguments are passed via the authentication
+             fields that are part of the SOCKS protocol.
+
+             First the "<Key>=<Value>" formatted arguments MUST be escaped,
+             such that all backslash, equal sign, and semicolon characters
+             are escaped with a backslash.
+
+             Second, all of the escaped are concatenated together.
+
+             Example:
+
+             shared-secret=rahasia;secrets-file=/tmp/blob
+
+             Lastly the arguments are transmitted when making the outgoing
+             connection using the authentication mechanism specific to the
+             SOCKS protocol version.
+
+             - In the case of SOCKS 4, the concatenated argument list is
+             transmitted in the "USERID" field of the "CONNECT" request.
+
+             - In the case of SOCKS 5, the parent process must negotiate
+             "Username/Password" authentication [RFC1929], and transmit
+             the arguments encoded in the "UNAME" and "PASSWD" fields.
+
+             If the encoded argument list is less than 255 bytes in
+             length, the "PLEN" field must be set to "1" and the "PASSWD"
+             field must contain a single NUL character.
+             */
         }
 
         /**
