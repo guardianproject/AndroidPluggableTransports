@@ -17,6 +17,8 @@ public class Obfs4Transport implements Transport {
 
     private final static int DEFAULT_OBFS4_SOCKS_PORT = 47351;
 
+    @Override
+    public void register ()
     {
         Dispatcher.get().register(PT_TRANSPORTS_OBFS4,getClass());
     }

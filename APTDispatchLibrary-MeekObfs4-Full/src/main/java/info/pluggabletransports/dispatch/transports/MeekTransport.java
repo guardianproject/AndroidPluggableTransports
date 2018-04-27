@@ -22,7 +22,7 @@ import iobfs4proxy.Iobfs4proxy;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
 
-public class MeekTransport implements Transport, Runnable {
+public class MeekTransport implements Transport {
 
     public final static String OPTION_FRONT = "front";
     public final static String OPTION_KEY = "key";
@@ -34,6 +34,8 @@ public class MeekTransport implements Transport, Runnable {
     private String mMeekKey;
     private String mMeekUrl;
 
+    @Override
+    public void register ()
     {
         Dispatcher.get().register(PT_TRANSPORTS_MEEK,getClass());
     }
@@ -54,7 +56,11 @@ public class MeekTransport implements Transport, Runnable {
         //for the IPC version
         //mTransportManager.startTransport();
 
-        new Thread(this).start();
+        //TODO: how do we pass in variables?
+
+        //for the in-process library
+        //calls obfs4 in the same thread, woot!
+        Iobfs4proxy.main();
 
         try {
             return new MeekConnection(addr, InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
@@ -64,15 +70,6 @@ public class MeekTransport implements Transport, Runnable {
         }
     }
 
-    public void run ()
-    {
-
-        //TODO: how do we pass in variables?
-
-        //for the in-process library
-        //calls obfs4 in the same thread, woot!
-        Iobfs4proxy.main();
-    }
 
     @Override
     public Listener listen(String addr) {

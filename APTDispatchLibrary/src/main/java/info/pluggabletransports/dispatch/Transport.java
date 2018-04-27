@@ -20,4 +20,7 @@ public interface Transport {
 //​ ​ Create​ ​ listener​ ​ for​ ​ incoming​ ​ transport​ ​ connection; The​ ​ Listen​ ​ method​ ​ implements​ ​ the​ ​ Server​ ​ Factory​ ​ abstract​ i
     public abstract Listener listen (String addr);
 
+    /** Used to register with the Dispatcher **/
+    public abstract void register ();
+
 }

@@ -18,6 +18,8 @@ public class ShadowSocksTransport implements Transport {
     private TransportManager mTransportManager;
     private final static String ASSET_KEY = "shadowsocks";
 
+    @Override
+    public void register ()
     {
         Dispatcher.get().register(PT_TRANSPORTS_SHADOWSOCKS,getClass());
     }

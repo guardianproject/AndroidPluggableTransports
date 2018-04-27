@@ -14,6 +14,8 @@ import info.pluggabletransports.dispatch.Transport;
 
 public class SampleTransport implements Transport {
 
+    @Override
+    public void register ()
     {
         Dispatcher.get().register("sample",getClass());
     }
