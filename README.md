@@ -7,5 +7,20 @@ This project is for implementing and providing access to transports compliant wi
 * Shapeshifter-Transports: https://github.com/OperatorFoundation/shapeshifter-transports
 * Orbot: Tor for Android: https://github.com/n8fr8/orbot
 
-You can see a rough diagram of the architecture here:
-https://raw.githubusercontent.com/guardianproject/AndroidPluggableTransportsDispatchService/master/docs/IMG_20171018_122031.jpg
+Here is a basic example of how to use the Dispatcher, to retrieve a Transport instance, which then can be used to make a connection to a specific "bridge" endpoint:
+
+        Transport transport = Dispatcher.get().getTransport(this, type, options);
+        if (transport != null)
+        {
+            Connection conn = transport.connect(bridgeAddress);
+            //now use the connection, either as a proxy, or to read and write bytes directly
+            if (conn.getLocalAddress() != null && conn.getLocalPort() != -1)
+                setSocksProxy (conn.getLocalAddress(), conn.getLocalPort());
+        }
+  
+  
+In some cases, the Connection instance returned can be used to setup a general purpose SOCKS proxy. In other cases, you will have to use the read() and write() methods of the Connection instance to transmit data over the transport.
+
+The core library is the 'APTDispatchLibrary', but you also need to include a specific library for the transports you wish to bundle and utilize in your app. For instance 'APTDispatchLibrary-MeekObfs4-Full' would include the obfs4proxy library for x86 and arm devices in both 32 and 64-bit. Alternatively, you can just include ''APTDispatchLibrary-MeekObfs4-ARM' for a smaller 'armeabi' only build, reducing the size from 9MB to 2MB.
+
+This project also demonstrates how to implement and register new Transport types, through the 'APTDispatchLibrary-SampleTransport' project. A Pluggable Transport can be implemented entirely in Java, or utilize any other language supported by the Android SDK or NDK.
