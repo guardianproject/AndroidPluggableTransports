@@ -21,6 +21,14 @@ Here is a basic example of how to use the Dispatcher, to retrieve a Transport in
   
 In some cases, the Connection instance returned can be used to setup a general purpose SOCKS proxy. In other cases, you will have to use the read() and write() methods of the Connection instance to transmit data over the transport.
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write("GET https://somewebsite.org/TheProject.html HTTP/1.0".getBytes());
+        conn.write(baos.toByteArray());
+
+        byte[] buffer = new byte[1024*64];
+        int read = conn.read(buffer,0,buffer.length);
+        String response = new String(buffer);
+
 The core library is the 'APTDispatchLibrary', but you also need to include a specific library for the transports you wish to bundle and utilize in your app. For instance 'APTDispatchLibrary-MeekObfs4-Full' would include the obfs4proxy library for x86 and arm devices in both 32 and 64-bit. Alternatively, you can just include ''APTDispatchLibrary-MeekObfs4-ARM' for a smaller 'armeabi' only build, reducing the size from 9MB to 2MB.
 
 This project also demonstrates how to implement and register new Transport types, through the 'APTDispatchLibrary-SampleTransport' project. A Pluggable Transport can be implemented entirely in Java, or utilize any other language supported by the Android SDK or NDK. Transport register by making this simple call
