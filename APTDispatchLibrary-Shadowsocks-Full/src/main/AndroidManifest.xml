@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="info.pluggabletransports.aptds">
+    package="info.pluggabletransports.transports.shadowsocks">
 
     <application
         android:allowBackup="true"
