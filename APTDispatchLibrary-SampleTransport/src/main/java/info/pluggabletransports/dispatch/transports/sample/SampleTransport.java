@@ -2,6 +2,9 @@ package info.pluggabletransports.dispatch.transports.sample;
 
 import android.content.Context;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Date;
 import java.util.Properties;
 
 import info.pluggabletransports.dispatch.Connection;
@@ -22,11 +25,64 @@ public class SampleTransport implements Transport {
 
     @Override
     public Connection connect(String addr) {
-        return null;
+        return new SampleConnection();
     }
 
     @Override
     public Listener listen(String addr) {
         return null;
+    }
+
+    class SampleConnection implements Connection {
+
+        @Override
+        public int read(byte[] b, int offset, int length) throws IOException {
+            return 0;
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+
+        }
+
+        @Override
+        public void close() {
+
+        }
+
+        @Override
+        public InetAddress getLocalAddress() {
+            return null;
+        }
+
+        @Override
+        public int getLocalPort() {
+            return 0;
+        }
+
+        @Override
+        public InetAddress getRemoteAddress() {
+            return null;
+        }
+
+        @Override
+        public int getRemotePort() {
+            return 0;
+        }
+
+        @Override
+        public void setDeadline(Date deadlineTime) {
+
+        }
+
+        @Override
+        public void setReadDeadline(Date deadlineTime) {
+
+        }
+
+        @Override
+        public void setWriteDeadline(Date deadlineTime) {
+
+        }
     }
 }

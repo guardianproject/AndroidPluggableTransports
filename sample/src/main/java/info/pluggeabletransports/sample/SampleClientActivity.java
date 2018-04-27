@@ -18,6 +18,13 @@ public class SampleClientActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample_client);
 
+        initMeekTransport();
+        initSampleTransport();
+    }
+
+    private void initMeekTransport ()
+    {
+
         Properties options = new Properties();
         String bridgeAddress = "https://meek.actualdomain.com";
 
@@ -26,6 +33,15 @@ public class SampleClientActivity extends AppCompatActivity {
 
         init(DispatchConstants.PT_TRANSPORTS_MEEK, bridgeAddress, options);
 
+    }
+
+    private void initSampleTransport ()
+    {
+        String bridgeAddress = "somecrazyaddress";
+        Properties options = new Properties();
+        options.put("password","thesecret");
+
+        init ("sample",bridgeAddress, options);
     }
 
     public void init (String type, String bridgeAddress, Properties options)
@@ -37,10 +53,9 @@ public class SampleClientActivity extends AppCompatActivity {
             Connection conn = transport.connect(bridgeAddress);
 
             //now use the connection, either as a proxy, or to read and write bytes directly
-
-            setSocksProxy (conn.getLocalAddress(), conn.getLocalPort());
-
-
+            if (conn.getLocalAddress() != null && conn.getLocalPort() != -1)
+                setSocksProxy (conn.getLocalAddress(), conn.getLocalPort());
+            
         }
     }
 
