@@ -1,4 +1,4 @@
-include ':APTDispatchLibrary'
+include ':APTDispatchLibrary', ':APTDispatchLibrary-SampleTransport'
 include ':APTDispatchLibrary-MeekObfs4-Full'
 include ':APTDispatchLibrary-Shadowsocks-Full'
 include ':sample'
