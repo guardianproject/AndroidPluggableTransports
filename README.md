@@ -23,4 +23,13 @@ In some cases, the Connection instance returned can be used to setup a general p
 
 The core library is the 'APTDispatchLibrary', but you also need to include a specific library for the transports you wish to bundle and utilize in your app. For instance 'APTDispatchLibrary-MeekObfs4-Full' would include the obfs4proxy library for x86 and arm devices in both 32 and 64-bit. Alternatively, you can just include ''APTDispatchLibrary-MeekObfs4-ARM' for a smaller 'armeabi' only build, reducing the size from 9MB to 2MB.
 
-This project also demonstrates how to implement and register new Transport types, through the 'APTDispatchLibrary-SampleTransport' project. A Pluggable Transport can be implemented entirely in Java, or utilize any other language supported by the Android SDK or NDK.
+This project also demonstrates how to implement and register new Transport types, through the 'APTDispatchLibrary-SampleTransport' project. A Pluggable Transport can be implemented entirely in Java, or utilize any other language supported by the Android SDK or NDK. Transport register by making this simple call
+
+    {
+        Dispatcher.get().register("sample",getClass());
+    }
+
+This then allows any app using the library to get an instance of the transport like so:
+
+        SampleTransport transport = (SampleTransport)Dispatcher.get().getTransport(this, "sample", options);
+
