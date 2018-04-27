@@ -43,6 +43,7 @@ public class SampleClientActivity extends AppCompatActivity {
 
     private void initMeekTransport ()
     {
+        new MeekTransport().register();
 
         Properties options = new Properties();
         String bridgeAddress = "https://meek.actualdomain.com";
@@ -56,6 +57,8 @@ public class SampleClientActivity extends AppCompatActivity {
 
     private void initSampleTransport ()
     {
+        new SampleTransport().register();
+
         String bridgeAddress = "somecrazyaddress";
         Properties options = new Properties();
         options.put(SampleTransport.SAMPLE_SPECIAL_OPTION,"thesecret");
