@@ -40,4 +40,23 @@ This project also demonstrates how to implement and register new Transport types
 This then allows any app using the library to get an instance of the transport like so:
 
         SampleTransport transport = (SampleTransport)Dispatcher.get().getTransport(this, "sample", options);
+        
+        
+
+
+Add it in your root build.gradle at the end of repositories:
+
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+
+Step 2. Add the dependency
+
+	dependencies {
+	        compile 'com.github.guardianproject:AndroidPluggableTransportsDispatcher:-SNAPSHOT'
+	}
+
 
