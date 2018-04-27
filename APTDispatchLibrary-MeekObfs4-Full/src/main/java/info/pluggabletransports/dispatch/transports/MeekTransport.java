@@ -24,8 +24,6 @@ public class MeekTransport implements Transport, Runnable {
 
     private final static String ASSET_KEY = "obfs4proxy";
 
-    private TransportManager mTransportManager;
-
     private final static int DEFAULT_MEEK_SOCKS_PORT = 47352;
 
     {
@@ -35,7 +33,6 @@ public class MeekTransport implements Transport, Runnable {
     @Override
     public void init(Context context, Properties options) {
 
-       // initMeekIPC(context);
         initMeekSharedLibrary();
     }
 
@@ -68,13 +65,6 @@ public class MeekTransport implements Transport, Runnable {
     @Override
     public Listener listen(String addr) {
         return null;
-    }
-
-    private void initMeekIPC (Context context)
-    {
-        //meek_lite 0.0.2.0:2 97700DFE9F483596DDA6264C4D7DF7641E1E39CE url=https://meek.azureedge.net/ front=ajax.aspnetcdn.com
-        mTransportManager = new TransportManager();
-        mTransportManager.installTransport(context,ASSET_KEY);
     }
 
     private void initMeekSharedLibrary ()
