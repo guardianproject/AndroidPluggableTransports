@@ -18,7 +18,14 @@ Here is a basic example of how to use the Dispatcher, to retrieve a Transport in
                 setSocksProxy (conn.getLocalAddress(), conn.getLocalPort());
         }
   
-  
+Each transport will like need specific configuration values in order to connect to the remote bridge or other resources. These values can shared through the bridge address argument, as well as the open-ended key/value options.
+
+	Properties options = new Properties();
+        String bridgeAddress = "https://meek.actualdomain.com";
+        options.put(MeekTransport.OPTION_FRONT,"www.somefrontabledomain.com");
+        options.put(MeekTransport.OPTION_KEY,"18800CFE9F483596DDA6264C4D7DF7331E1E39CE");
+        init("meek", bridgeAddress, options);
+
 In some cases, the Connection instance returned can be used to setup a general purpose SOCKS proxy. In other cases, you will have to use the read() and write() methods of the Connection instance to transmit data over the transport.
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
