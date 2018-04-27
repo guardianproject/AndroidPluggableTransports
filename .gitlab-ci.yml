@@ -24,7 +24,7 @@ test:
 
 errorprone:
   script:
-    - cat config/errorprone.gradle >> app/build.gradle
+    - for f in */build.gradle; do cat config/errorprone.gradle >> $f; done
     - ./gradlew assembleDebug
 
 after_script:
