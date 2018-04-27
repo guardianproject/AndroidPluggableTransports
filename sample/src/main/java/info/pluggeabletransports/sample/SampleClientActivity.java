@@ -2,6 +2,9 @@ package info.pluggeabletransports.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Properties;
 
@@ -41,10 +44,31 @@ public class SampleClientActivity extends AppCompatActivity {
         Properties options = new Properties();
         options.put("password","thesecret");
 
-        init ("sample",bridgeAddress, options);
+        Connection conn = init ("sample",bridgeAddress, options);
+
+        //now use the connection, either as a proxy, or to read and write bytes directly
+        if (conn.getLocalAddress() != null && conn.getLocalPort() != -1)
+            setSocksProxy (conn.getLocalAddress(), conn.getLocalPort());
+        else
+        {
+
+            //or read and write bytes directly!
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                baos.write("GET https://somewebsite.org/TheProject.html HTTP/1.0".getBytes());
+                conn.write(baos.toByteArray());
+
+                byte[] buffer = new byte[1024*64];
+                int read = conn.read(buffer,0,buffer.length);
+                String response = new String(buffer);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public void init (String type, String bridgeAddress, Properties options)
+    public Connection init (String type, String bridgeAddress, Properties options)
     {
         Transport transport = Dispatcher.get().getTransport(this, type, options);
 
@@ -52,11 +76,11 @@ public class SampleClientActivity extends AppCompatActivity {
         {
             Connection conn = transport.connect(bridgeAddress);
 
-            //now use the connection, either as a proxy, or to read and write bytes directly
-            if (conn.getLocalAddress() != null && conn.getLocalPort() != -1)
-                setSocksProxy (conn.getLocalAddress(), conn.getLocalPort());
+            return conn;
 
         }
+
+        return null;
     }
 
     private void setSocksProxy (InetAddress localSocks, int socksPort)
