@@ -1,24 +1,20 @@
 package info.pluggabletransports.dispatch.transports;
 
 import android.content.Context;
-import android.os.Build;
-import android.system.ErrnoException;
-import android.system.Os;
 import android.util.Log;
+import info.pluggabletransports.dispatch.Connection;
+import info.pluggabletransports.dispatch.DispatchConstants;
+import info.pluggabletransports.dispatch.Dispatcher;
+import info.pluggabletransports.dispatch.Listener;
+import info.pluggabletransports.dispatch.Transport;
+import info.pluggabletransports.dispatch.compat.OsCompat;
+import iobfs4proxy.Iobfs4proxy;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.file.attribute.PosixFileAttributes;
 import java.util.Date;
 import java.util.Properties;
-
-import info.pluggabletransports.dispatch.Connection;
-import info.pluggabletransports.dispatch.Dispatcher;
-import info.pluggabletransports.dispatch.Listener;
-import info.pluggabletransports.dispatch.Transport;
-import info.pluggabletransports.dispatch.util.TransportManager;
-import iobfs4proxy.Iobfs4proxy;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
 
@@ -56,8 +52,6 @@ public class MeekTransport implements Transport {
         //for the IPC version
         //mTransportManager.startTransport();
 
-        //TODO: how do we pass in variables?
-
         //for the in-process library
         //calls obfs4 in the same thread, woot!
         Iobfs4proxy.main();
@@ -81,34 +75,18 @@ public class MeekTransport implements Transport {
 
         try
         {
-            File filePtStateDir = new File(context.getCacheDir(),"ptstate");
+            OsCompat.setenv(DispatchConstants.TOR_PT_SERVER_TRANSPORTS, "meek");
+            OsCompat.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "1");
+            OsCompat.setenv(DispatchConstants.TOR_PT_PROXY, "");
 
-            if (!filePtStateDir.exists())
-                filePtStateDir.mkdirs();
-
-            setenv("TOR_PT_CLIENT_TRANSPORTS","meek");
-            //"obfs4,meek_lite,obfs2,obfs3,scramblesuit"
-
-            setenv("TOR_PT_EXIT_ON_STDIN_CLOSE","1");
-            setenv("TOR_PT_PROXY","");
-            setenv("TOR_PT_SERVER_TRANSPORTS","");
-            setenv("TOR_PT_MANAGED_TRANSPORT_VER","1");
-            setenv("TOR_PT_STATE_LOCATION",filePtStateDir.getAbsolutePath());
+            String clientTransports = OsCompat.getenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS);
+            String managedTransportVersion = OsCompat.getenv(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER);
+            String stateLocation = OsCompat.getenv(DispatchConstants.TOR_PT_STATE_LOCATION);
 
         } catch (Exception e) {
             Log.e(getClass().getName(),"Error setting env variables",e);
         }
 
-    }
-
-    private void setenv (String key, String value) throws ErrnoException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Os.setenv(key, value, true);
-        }
-        else
-        {
-            //what to do here for Pre-Lollipop devices?
-        }
     }
 
     class MeekConnection implements Connection {

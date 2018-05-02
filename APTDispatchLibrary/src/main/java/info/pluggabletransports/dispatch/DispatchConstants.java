@@ -10,7 +10,9 @@ public interface DispatchConstants {
 
     public final static String TAG = "APTDS";
 
-    /** Pluggable Transports 2.0 Spec Constants 3.3.1.1. Common Configuration Parameters**/
+    /**
+     * Pluggable Transports 2.0 Spec Constants 3.3.1.1. Common Configuration Parameters
+     **/
 
     public final static String PT_VERSION = "ptversion"; //decimal //Specify the Pluggable Transport protocol version to use
     public final static String PT_STATE_DIRECTORY = "state"; //string path or file // Specify the directory to use to store state information required by the transports
@@ -36,6 +38,31 @@ public interface DispatchConstants {
     public final static String PT_TRANSPORTS_SHADOWSOCKS = "ss";
     public final static String PT_TRANSPORTS_SNOWFLAKE = "snowflake";
 
+    // goptbundle env var names
+    /**
+     * If {@code tor} daemon keeps stdin open for use in termination detection (1/0)
+     */
+    public static final String TOR_PT_EXIT_ON_STDIN_CLOSE = "TOR_PT_EXIT_ON_STDIN_CLOSE";
+    /**
+     * Read the pluggable transports version from.
+     */
+    public static final String TOR_PT_MANAGED_TRANSPORT_VER = "TOR_PT_MANAGED_TRANSPORT_VER";
+    /**
+     * The directory to read the state of the pluggable transport from.
+     */
+    public static final String TOR_PT_STATE_LOCATION = "TOR_PT_STATE_LOCATION";
+    /**
+     * Comma-separated list of transports: obfs4,meek_lite,obfs2,obfs3,scramblesuit
+     */
+    public static final String TOR_PT_CLIENT_TRANSPORTS = "TOR_PT_CLIENT_TRANSPORTS";
+    /**
+     * Comma-separated list of transports: obfs4,meek_lite,obfs2,obfs3,scramblesuit
+     */
+    public static final String TOR_PT_SERVER_TRANSPORTS = "TOR_PT_SERVER_TRANSPORTS";
+    /**
+     * URL for the proxy to connect to in order to use the running pluggable transport
+     */
+    public static final String TOR_PT_PROXY = "TOR_PT_PROXY";
 
     /**
      * A request to Orbot to transparently start Tor services
@@ -78,7 +105,6 @@ public interface DispatchConstants {
     public final static int FILE_WRITE_BUFFER_SIZE = 2048;
 
     public final static String DIRECTORY_BINARIES = "bin";
-
 
 
 }
