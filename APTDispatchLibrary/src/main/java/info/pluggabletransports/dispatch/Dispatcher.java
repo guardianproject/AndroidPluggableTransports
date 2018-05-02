@@ -9,43 +9,37 @@ public class Dispatcher implements DispatchConstants {
 
     private static Dispatcher _instance;
 
-    private HashMap<String,Class> mTransportRegistery = new HashMap<>();
+    private HashMap<String, Class> mTransportRegistery = new HashMap<>();
 
-    private Dispatcher () {
+    private Dispatcher() {
 
         loadTransports();
 
     }
 
-    public static synchronized Dispatcher get ()
-    {
-        if (_instance == null)
-        {
+    public static synchronized Dispatcher get() {
+        if (_instance == null) {
             _instance = new Dispatcher();
         }
 
         return _instance;
     }
 
-    private void loadTransports ()
-    {
+    private void loadTransports() {
         //TODO: discover available transports here, and do what we need to get them ready
     }
 
-    public void register (String type, Class ptClass)
-    {
-        mTransportRegistery.put(type,ptClass);
+    public void register(String type, Class ptClass) {
+        mTransportRegistery.put(type, ptClass);
     }
 
-    public Transport getTransport (Context context, String type, Properties options)
-    {
+    public Transport getTransport(Context context, String type, Properties options) {
         Transport transport = null;
 
         Class ptClass = mTransportRegistery.get(type);
-        if (ptClass != null)
-        {
+        if (ptClass != null) {
             try {
-                transport = (Transport)ptClass.newInstance();
+                transport = (Transport) ptClass.newInstance();
                 if (transport != null)
                     transport.init(context, options);
 
@@ -59,7 +53,7 @@ public class Dispatcher implements DispatchConstants {
 
         }
 
-       return null;
+        return null;
     }
 
 }

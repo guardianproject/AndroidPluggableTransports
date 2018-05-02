@@ -2,6 +2,12 @@ package info.pluggabletransports.dispatch.transports;
 
 import android.content.Context;
 import android.util.Log;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Date;
+import java.util.Properties;
+
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
@@ -9,12 +15,6 @@ import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.compat.OsCompat;
 import iobfs4proxy.Iobfs4proxy;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Date;
-import java.util.Properties;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
 
@@ -31,9 +31,8 @@ public class MeekTransport implements Transport {
     private String mMeekUrl;
 
     @Override
-    public void register ()
-    {
-        Dispatcher.get().register(PT_TRANSPORTS_MEEK,getClass());
+    public void register() {
+        Dispatcher.get().register(PT_TRANSPORTS_MEEK, getClass());
     }
 
     @Override
@@ -58,8 +57,7 @@ public class MeekTransport implements Transport {
 
         try {
             return new MeekConnection(addr, InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             return null;
         }
     }
@@ -70,11 +68,9 @@ public class MeekTransport implements Transport {
         return null;
     }
 
-    private void initMeekSharedLibrary (Context context)
-    {
+    private void initMeekSharedLibrary(Context context) {
 
-        try
-        {
+        try {
             OsCompat.setenv(DispatchConstants.TOR_PT_SERVER_TRANSPORTS, "meek");
             OsCompat.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "1");
             OsCompat.setenv(DispatchConstants.TOR_PT_PROXY, "");
@@ -84,7 +80,7 @@ public class MeekTransport implements Transport {
             String stateLocation = OsCompat.getenv(DispatchConstants.TOR_PT_STATE_LOCATION);
 
         } catch (Exception e) {
-            Log.e(getClass().getName(),"Error setting env variables",e);
+            Log.e(getClass().getName(), "Error setting env variables", e);
         }
 
     }
@@ -94,17 +90,15 @@ public class MeekTransport implements Transport {
         private InetAddress mLocalAddress;
         private int mLocalPort;
 
-        public MeekConnection (String bridgeAddr, InetAddress localSocks, int port)
-        {
+        public MeekConnection(String bridgeAddr, InetAddress localSocks, int port) {
             //init connection to local socks port
             mLocalAddress = localSocks;
             mLocalPort = port;
 
-            initBridgeViaSocks ();
+            initBridgeViaSocks();
         }
 
-        private void initBridgeViaSocks ()
-        {
+        private void initBridgeViaSocks() {
             //connect to SOCKS port and pass the values appropriately to configure meek
             //see: https://gitweb.torproject.org/torspec.git/tree/pt-spec.txt#n628
 

@@ -1,8 +1,8 @@
 package info.pluggeabletransports.sample;
 
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,12 +28,14 @@ public class SampleClientActivity extends AppCompatActivity {
             protected void onPreExecute() {
                 // Pre Code
             }
+
             protected Void doInBackground(Void... unused) {
                 // Background Code
                 initMeekTransport();
                 initSampleTransport();
                 return null;
             }
+
             protected void onPostExecute(Void unused) {
                 // Post Code
             }
@@ -41,29 +43,27 @@ public class SampleClientActivity extends AppCompatActivity {
 
     }
 
-    private void initMeekTransport ()
-    {
+    private void initMeekTransport() {
         new MeekTransport().register();
 
         Properties options = new Properties();
         String bridgeAddress = "https://meek.actualdomain.com";
 
-        options.put(MeekTransport.OPTION_FRONT,"www.somefrontabledomain.com");
-        options.put(MeekTransport.OPTION_KEY,"18800CFE9F483596DDA6264C4D7DF7331E1E39CE");
+        options.put(MeekTransport.OPTION_FRONT, "www.somefrontabledomain.com");
+        options.put(MeekTransport.OPTION_KEY, "18800CFE9F483596DDA6264C4D7DF7331E1E39CE");
 
         init(DispatchConstants.PT_TRANSPORTS_MEEK, bridgeAddress, options);
 
     }
 
-    private void initSampleTransport ()
-    {
+    private void initSampleTransport() {
         new SampleTransport().register();
 
         String bridgeAddress = "somecrazyaddress";
         Properties options = new Properties();
-        options.put(SampleTransport.SAMPLE_SPECIAL_OPTION,"thesecret");
+        options.put(SampleTransport.SAMPLE_SPECIAL_OPTION, "thesecret");
 
-        Connection conn = init ("sample",bridgeAddress, options);
+        Connection conn = init("sample", bridgeAddress, options);
 
         if (conn != null) {
             //now use the connection, either as a proxy, or to read and write bytes directly
@@ -88,12 +88,10 @@ public class SampleClientActivity extends AppCompatActivity {
         }
     }
 
-    public Connection init (String type, String bridgeAddress, Properties options)
-    {
+    public Connection init(String type, String bridgeAddress, Properties options) {
         Transport transport = Dispatcher.get().getTransport(this, type, options);
 
-        if (transport != null)
-        {
+        if (transport != null) {
             Connection conn = transport.connect(bridgeAddress);
 
             return conn;
@@ -103,8 +101,7 @@ public class SampleClientActivity extends AppCompatActivity {
         return null;
     }
 
-    private void setSocksProxy (InetAddress localSocks, int socksPort)
-    {
+    private void setSocksProxy(InetAddress localSocks, int socksPort) {
         //do what you need here to proxy
     }
 }

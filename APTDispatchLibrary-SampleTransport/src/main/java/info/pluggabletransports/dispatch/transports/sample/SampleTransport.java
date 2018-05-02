@@ -14,13 +14,12 @@ import info.pluggabletransports.dispatch.Transport;
 
 public class SampleTransport implements Transport {
 
-    @Override
-    public void register ()
-    {
-        Dispatcher.get().register("sample",getClass());
-    }
-
     public final static String SAMPLE_SPECIAL_OPTION = "option1";
+
+    @Override
+    public void register() {
+        Dispatcher.get().register("sample", getClass());
+    }
 
     @Override
     public void init(Context context, Properties options) {

@@ -10,25 +10,23 @@ import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.util.TransportManager;
 
-import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_OBFS4;
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_SHADOWSOCKS;
 
 public class ShadowSocksTransport implements Transport {
 
-    private TransportManager mTransportManager;
     private final static String ASSET_KEY = "shadowsocks";
+    private TransportManager mTransportManager;
 
     @Override
-    public void register ()
-    {
-        Dispatcher.get().register(PT_TRANSPORTS_SHADOWSOCKS,getClass());
+    public void register() {
+        Dispatcher.get().register(PT_TRANSPORTS_SHADOWSOCKS, getClass());
     }
 
     @Override
     public void init(Context context, Properties options) {
 
         mTransportManager = new TransportManager();
-        mTransportManager.installTransport(context,ASSET_KEY);
+        mTransportManager.installTransport(context, ASSET_KEY);
     }
 
     @Override
