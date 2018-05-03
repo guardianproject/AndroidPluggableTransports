@@ -1,4 +1,6 @@
-include ':APTDispatchLibrary', ':APTDispatchLibrary-SampleTransport'
+include ':goptbundle'
+include ':APTDispatchLibrary'
+include ':APTDispatchLibrary-SampleTransport'
 include ':APTDispatchLibrary-MeekObfs4-Full'
 include ':APTDispatchLibrary-Shadowsocks-Full'
 include ':sample'

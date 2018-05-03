@@ -121,7 +121,7 @@ public class OsCompat {
     }
 
     private static void setenvReflection(String name, String value, boolean overwrite) {
-        // TODO
+        // TODO https://stackoverflow.com/questions/318239/how-do-i-set-environment-variables-from-java
         throw new UnsupportedOperationException("implement me!");
     }
 

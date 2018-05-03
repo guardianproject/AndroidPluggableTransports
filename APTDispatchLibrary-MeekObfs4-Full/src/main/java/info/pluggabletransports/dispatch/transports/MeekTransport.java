@@ -2,19 +2,18 @@ package info.pluggabletransports.dispatch.transports;
 
 import android.content.Context;
 import android.util.Log;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Date;
-import java.util.Properties;
-
+import goptbundle.Goptbundle;
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.compat.OsCompat;
-import iobfs4proxy.Iobfs4proxy;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Date;
+import java.util.Properties;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
 
@@ -26,6 +25,7 @@ public class MeekTransport implements Transport {
 
     private final static int DEFAULT_MEEK_SOCKS_PORT = 47352;
 
+    private String mPtStateDir;
     private String mMeekFrontDomain;
     private String mMeekKey;
     private String mMeekUrl;
@@ -40,6 +40,8 @@ public class MeekTransport implements Transport {
 
         initMeekSharedLibrary(context);
 
+        mPtStateDir = context.getDir("pt-state", Context.MODE_PRIVATE).getAbsolutePath();
+
         mMeekFrontDomain = options.getProperty(OPTION_FRONT);
         mMeekKey = options.getProperty(OPTION_KEY);
         mMeekUrl = options.getProperty(OPTION_URL);
@@ -53,7 +55,9 @@ public class MeekTransport implements Transport {
 
         //for the in-process library
         //calls obfs4 in the same thread, woot!
-        Iobfs4proxy.main();
+        Log.i(TAG, "Goptbundle.getVersion() " + Goptbundle.getVersion());
+        Log.i(TAG, "Goptbundle.getLogFilePath() " + Goptbundle.getLogFilePath());
+        Goptbundle.load(mPtStateDir);
 
         try {
             return new MeekConnection(addr, InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
@@ -71,13 +75,13 @@ public class MeekTransport implements Transport {
     private void initMeekSharedLibrary(Context context) {
 
         try {
+            OsCompat.setenv(DispatchConstants.TOR_PT_STATE_LOCATION, mPtStateDir);
             OsCompat.setenv(DispatchConstants.TOR_PT_SERVER_TRANSPORTS, "meek");
             OsCompat.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "1");
             OsCompat.setenv(DispatchConstants.TOR_PT_PROXY, "");
 
             String clientTransports = OsCompat.getenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS);
             String managedTransportVersion = OsCompat.getenv(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER);
-            String stateLocation = OsCompat.getenv(DispatchConstants.TOR_PT_STATE_LOCATION);
 
         } catch (Exception e) {
             Log.e(getClass().getName(), "Error setting env variables", e);
