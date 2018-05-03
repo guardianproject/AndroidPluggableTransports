@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: [ '*.aar'], dir: 'libs')
+    implementation project(path: ':goptbundle')
     implementation project(path: ':APTDispatchLibrary')
 }
 
