@@ -8,13 +8,13 @@ import java.net.InetAddress;
 import java.util.Date;
 import java.util.Properties;
 
+import goptbundle.Goptbundle;
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.compat.OsCompat;
-import iobfs4proxy.Iobfs4proxy;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
 
@@ -53,7 +53,7 @@ public class MeekTransport implements Transport {
 
         //for the in-process library
         //calls obfs4 in the same thread, woot!
-        Iobfs4proxy.main();
+        Goptbundle.main();
 
         try {
             return new MeekConnection(addr, InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
