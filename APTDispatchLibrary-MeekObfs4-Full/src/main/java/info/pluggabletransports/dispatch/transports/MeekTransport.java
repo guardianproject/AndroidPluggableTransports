@@ -2,12 +2,6 @@ package info.pluggabletransports.dispatch.transports;
 
 import android.content.Context;
 import android.util.Log;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Date;
-import java.util.Properties;
-
 import goptbundle.Goptbundle;
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
@@ -54,14 +48,6 @@ public class MeekTransport implements Transport {
 
     @Override
     public Connection connect(String addr) {
-
-        //for the IPC version
-        //mTransportManager.startTransport();
-
-        //for the in-process library
-        //calls obfs4 in the same thread, woot!
-        Log.i(TAG, "Goptbundle.getVersion() " + Goptbundle.getVersion());
-        Log.i(TAG, "Goptbundle.getLogFilePath() " + Goptbundle.getLogFilePath());
         Goptbundle.load(mPtStateDir);
 
         try {
@@ -177,7 +163,7 @@ public class MeekTransport implements Transport {
          */
         @Override
         public void close() {
-
+            Goptbundle.close();
         }
 
         @Override
