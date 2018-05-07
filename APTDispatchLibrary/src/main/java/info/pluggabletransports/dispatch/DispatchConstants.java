@@ -39,6 +39,7 @@ public interface DispatchConstants {
     public final static String PT_TRANSPORTS_SNOWFLAKE = "snowflake";
 
     // goptbundle env var names
+    public static final String TOR_PT_LOG_LEVEL = "TOR_PT_LOG_LEVEL";
     /**
      * If {@code tor} daemon keeps stdin open for use in termination detection (1/0)
      */
@@ -59,10 +60,15 @@ public interface DispatchConstants {
      * Comma-separated list of transports: obfs4,meek_lite,obfs2,obfs3,scramblesuit
      */
     public static final String TOR_PT_SERVER_TRANSPORTS = "TOR_PT_SERVER_TRANSPORTS";
+    public static final String TOR_PT_SERVER_BINDADDR = "TOR_PT_SERVER_BINDADDR";
+    public static final String TOR_PT_SERVER_TRANSPORT_OPTIONS = "TOR_PT_SERVER_TRANSPORT_OPTIONS";
     /**
      * URL for the proxy to connect to in order to use the running pluggable transport
      */
     public static final String TOR_PT_PROXY = "TOR_PT_PROXY";
+    public static final String TOR_PT_ORPORT = "TOR_PT_ORPORT";
+    public static final String TOR_PT_AUTH_COOKIE_FILE = "TOR_PT_AUTH_COOKIE_FILE";
+    public static final String TOR_PT_EXTENDED_SERVER_PORT = "TOR_PT_EXTENDED_SERVER_PORT";
 
     /**
      * A request to Orbot to transparently start Tor services
