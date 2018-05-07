@@ -14,7 +14,6 @@ import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
-import info.pluggabletransports.dispatch.compat.OsCompat;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -81,13 +80,11 @@ public class MeekTransport implements Transport {
     private void initMeekSharedLibrary(Context context) {
 
         try {
-            OsCompat.setenv(DispatchConstants.TOR_PT_STATE_LOCATION, mPtStateDir);
-            OsCompat.setenv(DispatchConstants.TOR_PT_SERVER_TRANSPORTS, "meek");
-            OsCompat.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "1");
-            OsCompat.setenv(DispatchConstants.TOR_PT_PROXY, "");
+            Goptbundle.setenv(DispatchConstants.TOR_PT_LOG_LEVEL, "DEBUG");
+            Goptbundle.setenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, "meek_lite");
+            Goptbundle.setenv(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
+            Goptbundle.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0");
 
-            String clientTransports = OsCompat.getenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS);
-            String managedTransportVersion = OsCompat.getenv(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER);
 
         } catch (Exception e) {
             Log.e(getClass().getName(), "Error setting env variables", e);
