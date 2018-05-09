@@ -5,7 +5,9 @@ import android.util.Log;
 
 
 import com.runjva.sourceforge.jsocks.protocol.Socks4Proxy;
+import com.runjva.sourceforge.jsocks.protocol.Socks5Proxy;
 import com.runjva.sourceforge.jsocks.protocol.SocksSocket;
+import com.runjva.sourceforge.jsocks.protocol.UserPasswordAuthentication;
 
 import goptbundle.Goptbundle;
 import info.pluggabletransports.dispatch.Connection;
@@ -16,6 +18,7 @@ import info.pluggabletransports.dispatch.Transport;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -56,7 +59,10 @@ public class MeekTransport implements Transport {
 
     @Override
     public Connection connect(String addr) {
-        Goptbundle.load(mPtStateDir);
+
+        //let's start the transport in it's own thread
+        exec(new Runnable() { public void run () { Goptbundle.load(mPtStateDir); } });
+
 
         try {
             return new MeekConnection(addr, InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
@@ -66,6 +72,10 @@ public class MeekTransport implements Transport {
         }
     }
 
+    private void exec (Runnable run)
+    {
+        new Thread (run).start();
+    }
 
     @Override
     public Listener listen(String addr) {
@@ -89,10 +99,14 @@ public class MeekTransport implements Transport {
 
         private InetAddress mLocalAddress;
         private int mLocalPort;
+        private String mRemoteAddress;
+        private int mRemotePort;
 
         public MeekConnection(String bridgeAddr, InetAddress localSocks, int port) throws IOException {
-            //init connection to local socks port
-            mMeekUrl = bridgeAddr;
+
+            String[] addressparts = bridgeAddr.split(":");
+            mRemoteAddress = addressparts[0];
+            mRemotePort = Integer.parseInt(addressparts[1]);
             mLocalAddress = localSocks;
             mLocalPort = port;
 
@@ -107,12 +121,15 @@ public class MeekTransport implements Transport {
 
             meekConfig.append(OPTION_URL).append("=").append(mMeekUrl).append(";");
             meekConfig.append(OPTION_FRONT).append("=").append(mMeekFrontDomain).append(";");
-            meekConfig.append(OPTION_KEY).append("=").append(mMeekKey).append(";");
+            meekConfig.append(OPTION_KEY).append("=").append(mMeekKey);
 
-             Socks4Proxy proxy = new Socks4Proxy("127.0.0.1",DEFAULT_MEEK_SOCKS_PORT,meekConfig.toString());
-              SocksSocket s = new SocksSocket(proxy, "www.torproject.org",80);
-             InputStream is = s.getInputStream();
+            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,DEFAULT_MEEK_SOCKS_PORT);
+            UserPasswordAuthentication auth = new UserPasswordAuthentication(meekConfig.toString(),"");
+            proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
+            SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);
 
+            InputStream is = s.getInputStream();
+            OutputStream os = s.getOutputStream();
             /**
              * 3.5. Pluggable Transport Client Per-Connection Arguments
 
