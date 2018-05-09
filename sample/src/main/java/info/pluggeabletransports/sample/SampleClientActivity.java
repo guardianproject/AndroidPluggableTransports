@@ -47,10 +47,11 @@ public class SampleClientActivity extends AppCompatActivity {
         new MeekTransport().register();
 
         Properties options = new Properties();
-        String bridgeAddress = "https://meek.actualdomain.com";
+        String bridgeAddress = "https://meek.azureedge.net/";
 
-        options.put(MeekTransport.OPTION_FRONT, "www.somefrontabledomain.com");
-        options.put(MeekTransport.OPTION_KEY, "18800CFE9F483596DDA6264C4D7DF7331E1E39CE");
+        options.put(MeekTransport.OPTION_URL,bridgeAddress);
+        options.put(MeekTransport.OPTION_FRONT, "ajax.aspnetcdn.com");
+        options.put(MeekTransport.OPTION_KEY, "97700DFE9F483596DDA6264C4D7DF7641E1E39CE");
 
         init(DispatchConstants.PT_TRANSPORTS_MEEK, bridgeAddress, options);
 
