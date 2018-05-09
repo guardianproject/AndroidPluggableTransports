@@ -47,13 +47,13 @@ public class SampleClientActivity extends AppCompatActivity {
         new MeekTransport().register();
 
         Properties options = new Properties();
-        String bridgeAddress = "https://meek.azureedge.net/";
+        String remoteAddress = "185.152.65.180:9001";// a public Tor guard to test
 
-        options.put(MeekTransport.OPTION_URL,bridgeAddress);
-        options.put(MeekTransport.OPTION_FRONT, "ajax.aspnetcdn.com");
-        options.put(MeekTransport.OPTION_KEY, "97700DFE9F483596DDA6264C4D7DF7641E1E39CE");
+        options.put(MeekTransport.OPTION_URL,"https://meek.azureedge.net/"); //the public Tor Meek endpoint
+        options.put(MeekTransport.OPTION_FRONT, "ajax.aspnetcdn.com"); //the domain fronting address to use
+        options.put(MeekTransport.OPTION_KEY, "97700DFE9F483596DDA6264C4D7DF7641E1E39CE"); //the key that is needed for this endpoint
 
-        init(DispatchConstants.PT_TRANSPORTS_MEEK, bridgeAddress, options);
+        init(DispatchConstants.PT_TRANSPORTS_MEEK, remoteAddress, options);
 
     }
 
