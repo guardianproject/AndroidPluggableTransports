@@ -2,6 +2,11 @@ package info.pluggabletransports.dispatch.transports;
 
 import android.content.Context;
 import android.util.Log;
+
+
+import com.runjva.sourceforge.jsocks.protocol.Socks4Proxy;
+import com.runjva.sourceforge.jsocks.protocol.SocksSocket;
+
 import goptbundle.Goptbundle;
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
@@ -10,11 +15,14 @@ import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Properties;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
+import static info.pluggabletransports.dispatch.DispatchConstants.TAG;
 
 public class MeekTransport implements Transport {
 
@@ -53,6 +61,7 @@ public class MeekTransport implements Transport {
         try {
             return new MeekConnection(addr, InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
         } catch (IOException e) {
+            Log.e(getClass().getName(),"Error making connection",e);
             return null;
         }
     }
@@ -70,8 +79,6 @@ public class MeekTransport implements Transport {
             Goptbundle.setenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, "meek_lite");
             Goptbundle.setenv(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
             Goptbundle.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0");
-
-
         } catch (Exception e) {
             Log.e(getClass().getName(), "Error setting env variables", e);
         }
@@ -83,17 +90,28 @@ public class MeekTransport implements Transport {
         private InetAddress mLocalAddress;
         private int mLocalPort;
 
-        public MeekConnection(String bridgeAddr, InetAddress localSocks, int port) {
+        public MeekConnection(String bridgeAddr, InetAddress localSocks, int port) throws IOException {
             //init connection to local socks port
+            mMeekUrl = bridgeAddr;
             mLocalAddress = localSocks;
             mLocalPort = port;
 
             initBridgeViaSocks();
         }
 
-        private void initBridgeViaSocks() {
+        private void initBridgeViaSocks() throws IOException {
             //connect to SOCKS port and pass the values appropriately to configure meek
             //see: https://gitweb.torproject.org/torspec.git/tree/pt-spec.txt#n628
+
+            StringBuffer meekConfig = new StringBuffer();
+
+            meekConfig.append(OPTION_URL).append("=").append(mMeekUrl).append(";");
+            meekConfig.append(OPTION_FRONT).append("=").append(mMeekFrontDomain).append(";");
+            meekConfig.append(OPTION_KEY).append("=").append(mMeekKey).append(";");
+
+             Socks4Proxy proxy = new Socks4Proxy("127.0.0.1",DEFAULT_MEEK_SOCKS_PORT,meekConfig.toString());
+              SocksSocket s = new SocksSocket(proxy, "www.torproject.org",80);
+             InputStream is = s.getInputStream();
 
             /**
              * 3.5. Pluggable Transport Client Per-Connection Arguments

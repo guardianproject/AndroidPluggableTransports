@@ -24,6 +24,7 @@ android {
 dependencies {
     implementation project(path: ':goptbundle')
     implementation project(path: ':APTDispatchLibrary')
+    implementation project(path: ':jsocksAndroid')
 }
 
 
