@@ -102,6 +102,9 @@ public class MeekTransport implements Transport {
         private String mRemoteAddress;
         private int mRemotePort;
 
+        private InputStream mInputStream;
+        private OutputStream mOutputStream;
+
         public MeekConnection(String bridgeAddr, InetAddress localSocks, int port) throws IOException {
 
             String[] addressparts = bridgeAddr.split(":");
@@ -128,8 +131,8 @@ public class MeekTransport implements Transport {
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
             SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);
 
-            InputStream is = s.getInputStream();
-            OutputStream os = s.getOutputStream();
+            mInputStream = s.getInputStream();
+            mOutputStream = s.getOutputStream();
             /**
              * 3.5. Pluggable Transport Client Per-Connection Arguments
 
@@ -179,7 +182,7 @@ public class MeekTransport implements Transport {
          */
         @Override
         public int read(byte[] b, int offset, int length) throws IOException {
-            return 0;
+            return mInputStream.read(b,offset,length);
         }
 
         /**
@@ -190,7 +193,8 @@ public class MeekTransport implements Transport {
          */
         @Override
         public void write(byte[] b) throws IOException {
-
+            mOutputStream.write(b);
+            mOutputStream.flush();
         }
 
         /**
@@ -198,6 +202,14 @@ public class MeekTransport implements Transport {
          */
         @Override
         public void close() {
+
+            try {
+                mOutputStream.close();
+                mInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             Goptbundle.close();
         }
 
@@ -213,12 +225,17 @@ public class MeekTransport implements Transport {
 
         @Override
         public InetAddress getRemoteAddress() {
+            try {
+                return InetAddress.getByName(mRemoteAddress);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
             return null;
         }
 
         @Override
         public int getRemotePort() {
-            return 0;
+            return mRemotePort;
         }
 
         @Override
