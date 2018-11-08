@@ -40,6 +40,8 @@ public class MeekTransport implements Transport {
     private String mMeekKey;
     private String mMeekUrl;
 
+    private final static String NUL_CHAR = "\u0000";
+
     @Override
     public void register() {
         Dispatcher.get().register(PT_TRANSPORTS_MEEK, getClass());
@@ -120,14 +122,16 @@ public class MeekTransport implements Transport {
             //connect to SOCKS port and pass the values appropriately to configure meek
             //see: https://gitweb.torproject.org/torspec.git/tree/pt-spec.txt#n628
 
-            StringBuffer meekConfig = new StringBuffer();
+            StringBuffer meekConfigUser = new StringBuffer();
 
-            meekConfig.append(OPTION_URL).append("=").append(mMeekUrl).append(";");
-            meekConfig.append(OPTION_FRONT).append("=").append(mMeekFrontDomain).append(";");
-            meekConfig.append(OPTION_KEY).append("=").append(mMeekKey);
+            meekConfigUser.append(OPTION_URL).append("\\=").append(mMeekUrl).append("\\;");
+            meekConfigUser.append(OPTION_FRONT).append("\\=").append(mMeekFrontDomain).append("\\;");
+
+            StringBuffer meekConfigPass = new StringBuffer();
+            meekConfigPass.append(OPTION_KEY).append("\\=").append(mMeekKey).append("\\;");
 
             Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,DEFAULT_MEEK_SOCKS_PORT);
-            UserPasswordAuthentication auth = new UserPasswordAuthentication(meekConfig.toString(),"");
+            UserPasswordAuthentication auth = new UserPasswordAuthentication(meekConfigUser.toString(),meekConfigPass.toString());
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
             SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);
 
