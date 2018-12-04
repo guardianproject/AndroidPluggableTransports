@@ -1,31 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="info.pluggabletransports.transports.meekobfs4">
 
-    <application
-        android:allowBackup="true"
-        android:label="@string/app_name">
 
-        <receiver
-            android:name="info.pluggabletransports.dispatch.service.DispatchReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="info.pluggabletransports.intent.action.START" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name="info.pluggabletransports.dispatch.service.DispatchService"
-            android:enabled="true"
-            android:stopWithTask="false"></service>
-        <service
-            android:name="info.pluggabletransports.dispatch.service.DispatchVPN"
-            android:enabled="true"
-            android:permission="android.permission.BIND_VPN_SERVICE">
-            <intent-filter>
-                <action android:name="android.net.VpnService" />
-            </intent-filter>
-        </service>
-
-    </application>
 
 </manifest>
