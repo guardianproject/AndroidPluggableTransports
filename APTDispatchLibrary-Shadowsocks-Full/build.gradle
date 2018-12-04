@@ -1,5 +1,10 @@
 apply plugin: 'com.android.library'
 
+
+repositories {
+    maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+}
+
 android {
     compileSdkVersion 27
     buildToolsVersion '28.0.3'
@@ -22,8 +27,8 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':goptbundle')
-    implementation project(path: ':APTDispatchLibrary')
+    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.0'
+
 }
 
 sourceCompatibility = "1.7"
