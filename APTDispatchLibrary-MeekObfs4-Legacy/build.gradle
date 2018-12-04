@@ -1,5 +1,9 @@
 apply plugin: 'com.android.library'
 
+repositories {
+    maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+}
+
 android {
     compileSdkVersion 27
     buildToolsVersion '28.0.3'
@@ -22,9 +26,9 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':goptbundle')
-    implementation project(path: ':APTDispatchLibrary')
-    implementation project(path: ':jsocksAndroid')
+    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.0'
+    implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.0'
+
 }
 
 apply plugin: 'maven'
@@ -35,7 +39,7 @@ uploadArchives {
                 repository(url: "file://${deployPath.absolutePath}")
                 pom.project {
                         groupId 'info.pluggabletransports.aptds'
-                        artifactId 'apt-meek-obfs4'
+                        artifactId 'apt-meek-obfs4-legacy'
                         version "1.0.0"
                 }
         }
