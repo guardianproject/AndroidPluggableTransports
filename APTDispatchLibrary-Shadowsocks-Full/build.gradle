@@ -28,3 +28,18 @@ dependencies {
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
+apply plugin: 'maven'
+
+uploadArchives {
+        repositories.mavenDeployer {
+                def deployPath = file(getProperty('aar.deployPath'))
+                repository(url: "file://${deployPath.absolutePath}")
+                pom.project {
+                        groupId 'info.pluggabletransports.aptds'
+                        artifactId 'apt-shadowsocks'
+                        version "1.0.0"
+                }
+        }
+}
+
