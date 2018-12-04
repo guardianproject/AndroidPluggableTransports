@@ -112,6 +112,7 @@ public class Obfs4Transport implements Transport {
             mLocalPort = port;
 
             initBridgeViaSocks();
+
         }
 
         private void initBridgeViaSocks() throws IOException {
@@ -131,42 +132,7 @@ public class Obfs4Transport implements Transport {
 
             mInputStream = s.getInputStream();
             mOutputStream = s.getOutputStream();
-            /**
-             * 3.5. Pluggable Transport Client Per-Connection Arguments
 
-             Certain PT transport protocols require that the client provides
-             per-connection arguments when making outgoing connections.  On
-             the server side, this is handled by the "ARGS" optional argument
-             as part of the "SMETHOD" message.
-
-             On the client side, arguments are passed via the authentication
-             fields that are part of the SOCKS protocol.
-
-             First the "<Key>=<Value>" formatted arguments MUST be escaped,
-             such that all backslash, equal sign, and semicolon characters
-             are escaped with a backslash.
-
-             Second, all of the escaped are concatenated together.
-
-             Example:
-
-             shared-secret=rahasia;secrets-file=/tmp/blob
-
-             Lastly the arguments are transmitted when making the outgoing
-             connection using the authentication mechanism specific to the
-             SOCKS protocol version.
-
-             - In the case of SOCKS 4, the concatenated argument list is
-             transmitted in the "USERID" field of the "CONNECT" request.
-
-             - In the case of SOCKS 5, the parent process must negotiate
-             "Username/Password" authentication [RFC1929], and transmit
-             the arguments encoded in the "UNAME" and "PASSWD" fields.
-
-             If the encoded argument list is less than 255 bytes in
-             length, the "PLEN" field must be set to "1" and the "PASSWD"
-             field must contain a single NUL character.
-             */
         }
 
         /**
