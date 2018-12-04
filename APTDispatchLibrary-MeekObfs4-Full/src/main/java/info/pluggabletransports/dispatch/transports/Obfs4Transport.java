@@ -32,7 +32,7 @@ public class Obfs4Transport implements Transport {
 
     public final static String OPTION_KEY = "key";
 
-    private final static int DEFAULT_OBFS4_SOCKS_PORT = 47352;
+    private int mLocalSocksPort = -1;
 
     private String mPtStateDir;
     private String mObfs4Key;
@@ -63,7 +63,7 @@ public class Obfs4Transport implements Transport {
 
 
         try {
-            return new Obfs4Connection(addr, InetAddress.getLocalHost(), DEFAULT_OBFS4_SOCKS_PORT);
+            return new Obfs4Connection(addr, InetAddress.getLocalHost(), mLocalSocksPort);
         } catch (IOException e) {
             Log.e(getClass().getName(),"Error making connection",e);
             return null;
@@ -125,7 +125,7 @@ public class Obfs4Transport implements Transport {
             StringBuffer socksPass = new StringBuffer();
             socksPass.append(NUL_CHAR);
 
-            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,DEFAULT_OBFS4_SOCKS_PORT);
+            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
             UserPasswordAuthentication auth = new UserPasswordAuthentication(socksUser.toString(),socksPass.toString());
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
             SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);

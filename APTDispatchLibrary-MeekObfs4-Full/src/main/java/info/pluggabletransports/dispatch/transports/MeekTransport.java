@@ -33,7 +33,7 @@ public class MeekTransport implements Transport {
     public final static String OPTION_KEY = "key";
     public final static String OPTION_URL = "url";
 
-    private final static int DEFAULT_MEEK_SOCKS_PORT = 47352;
+    private int mLocalSocksPort = 47352;
 
     private String mPtStateDir;
     private String mMeekFrontDomain;
@@ -67,7 +67,7 @@ public class MeekTransport implements Transport {
 
 
         try {
-            return new MeekConnection(addr, InetAddress.getLocalHost(), DEFAULT_MEEK_SOCKS_PORT);
+            return new MeekConnection(addr, InetAddress.getLocalHost(), mLocalSocksPort);
         } catch (IOException e) {
             Log.e(getClass().getName(),"Error making connection",e);
             return null;
@@ -131,7 +131,7 @@ public class MeekTransport implements Transport {
             StringBuffer socksPass = new StringBuffer();
             socksPass.append(NUL_CHAR);
 
-            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,DEFAULT_MEEK_SOCKS_PORT);
+            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
             UserPasswordAuthentication auth = new UserPasswordAuthentication(socksUser.toString(),socksPass.toString());
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
             SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);
