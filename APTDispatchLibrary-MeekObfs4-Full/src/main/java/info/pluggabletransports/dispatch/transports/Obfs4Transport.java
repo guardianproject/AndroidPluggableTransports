@@ -1,6 +1,7 @@
 package info.pluggabletransports.dispatch.transports;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 
@@ -9,6 +10,8 @@ import com.runjva.sourceforge.jsocks.protocol.Socks5Proxy;
 import com.runjva.sourceforge.jsocks.protocol.SocksSocket;
 import com.runjva.sourceforge.jsocks.protocol.UserPasswordAuthentication;
 
+import org.w3c.dom.Text;
+
 import goptbundle.Goptbundle;
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
@@ -16,8 +19,10 @@ import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,7 +35,7 @@ import static info.pluggabletransports.dispatch.DispatchConstants.TAG;
 
 public class Obfs4Transport implements Transport {
 
-    public final static String OPTION_KEY = "key";
+    public final static String OPTION_KEY = "cert";
 
     private int mLocalSocksPort = -1;
 
@@ -56,10 +61,28 @@ public class Obfs4Transport implements Transport {
     }
 
     @Override
-    public Connection connect(String addr) {
+    public Connection connect(final String addr) {
 
         //let's start the transport in it's own thread
         exec(new Runnable() { public void run () { Goptbundle.load(mPtStateDir); } });
+        exec(new Runnable() { public void run () {
+
+            String line = getLogLine("socks5",100);
+            //         CMETHOD trebuchet socks5 127.0.0.1:19999
+
+            if (!TextUtils.isEmpty(line))
+            {
+                String[] parts = line.split(" ");
+                for (String part : parts) {
+                    if (part.contains("127.0.0.1")) {
+                        String[] addrParts = part.split(":");
+                        mLocalSocksPort = Integer.parseInt(addrParts[1]);
+                        break;
+                    }
+                }
+            }
+
+        } });
 
 
         try {
@@ -103,9 +126,9 @@ public class Obfs4Transport implements Transport {
         private InputStream mInputStream;
         private OutputStream mOutputStream;
 
-        public Obfs4Connection(String bridgeAddr, InetAddress localSocks, int port) throws IOException {
+        public Obfs4Connection(String remoteAddress, InetAddress localSocks, int port) throws IOException {
 
-            String[] addressparts = bridgeAddr.split(":");
+            String[] addressparts = remoteAddress.split(":");
             mRemoteAddress = addressparts[0];
             mRemotePort = Integer.parseInt(addressparts[1]);
             mLocalAddress = localSocks;
@@ -216,5 +239,21 @@ public class Obfs4Transport implements Transport {
         public void setWriteDeadline(Date deadlineTime) {
 
         }
+    }
+
+    private static String getLogLine(String matchChars, int max){
+        try {
+            Process process = Runtime.getRuntime().exec("logcat -d");
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+            String line;
+            int i = 0;
+            while ((line = bufferedReader.readLine()) != null && i++ < max) {
+                if (line.contains(matchChars))
+                    return line;
+            }
+        } catch (IOException e) {
+        }
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package info.pluggabletransports.dispatch.transports;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 
@@ -16,8 +17,10 @@ import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -64,7 +67,24 @@ public class MeekTransport implements Transport {
 
         //let's start the transport in it's own thread
         exec(new Runnable() { public void run () { Goptbundle.load(mPtStateDir); } });
+        exec(new Runnable() { public void run () {
 
+            String line = getLogLine("socks5",100);
+            //         CMETHOD trebuchet socks5 127.0.0.1:19999
+
+            if (!TextUtils.isEmpty(line))
+            {
+                String[] parts = line.split(" ");
+                for (String part : parts) {
+                    if (part.contains("127.0.0.1")) {
+                        String[] addrParts = part.split(":");
+                        mLocalSocksPort = Integer.parseInt(addrParts[1]);
+                        break;
+                    }
+                }
+            }
+
+        } });
 
         try {
             return new MeekConnection(addr, InetAddress.getLocalHost(), mLocalSocksPort);
@@ -107,9 +127,9 @@ public class MeekTransport implements Transport {
         private InputStream mInputStream;
         private OutputStream mOutputStream;
 
-        public MeekConnection(String bridgeAddr, InetAddress localSocks, int port) throws IOException {
+        public MeekConnection(String remoteAddress, InetAddress localSocks, int port) throws IOException {
 
-            String[] addressparts = bridgeAddr.split(":");
+            String[] addressparts = remoteAddress.split(":");
             mRemoteAddress = addressparts[0];
             mRemotePort = Integer.parseInt(addressparts[1]);
             mLocalAddress = localSocks;
@@ -222,6 +242,22 @@ public class MeekTransport implements Transport {
         public void setWriteDeadline(Date deadlineTime) {
 
         }
+    }
+
+    private static String getLogLine(String matchChars, int max){
+        try {
+            Process process = Runtime.getRuntime().exec("logcat -d");
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+            String line;
+            int i = 0;
+            while ((line = bufferedReader.readLine()) != null && i++ < max) {
+                if (line.contains(matchChars))
+                    return line;
+            }
+        } catch (IOException e) {
+        }
+        return null;
     }
 }
 
