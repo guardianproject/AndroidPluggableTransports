@@ -29,3 +29,18 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.jrummyapps:android-shell:1.0.1'
 }
+
+apply plugin: 'maven'
+
+uploadArchives {
+        repositories.mavenDeployer {
+                def deployPath = file(getProperty('aar.deployPath'))
+                repository(url: "file://${deployPath.absolutePath}")
+                pom.project {
+                        groupId 'info.pluggabletransports.aptds'
+                        artifactId 'apt-dispatch-library'
+                        version "1.0.0"
+                }
+        }
+}
+
