@@ -27,4 +27,18 @@ dependencies {
     implementation project(path: ':jsocksAndroid')
 }
 
+apply plugin: 'maven'
+
+uploadArchives {
+        repositories.mavenDeployer {
+                def deployPath = file(getProperty('aar.deployPath'))
+                repository(url: "file://${deployPath.absolutePath}")
+                pom.project {
+                        groupId 'info.pluggabletransports.aptds'
+                        artifactId 'apt-meek-obfs4'
+                        version "1.0.0"
+                }
+        }
+}
+
 
