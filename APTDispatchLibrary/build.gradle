@@ -39,7 +39,7 @@ uploadArchives {
                 pom.project {
                         groupId 'info.pluggabletransports.aptds'
                         artifactId 'apt-dispatch-library'
-                        version "1.0.0"
+                        version "1.0.1"
                 }
         }
 }

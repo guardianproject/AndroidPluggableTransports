@@ -27,8 +27,9 @@ android {
 
 dependencies {
 //    implementation project(path: ':goptbundle')
+    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.1'
+
     implementation 'info.pluggabletransports.aptds:goptbundle:1.0.0'
-    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.0'
     implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.0'
 
     //implementation project(path: ':jsocksAndroid')

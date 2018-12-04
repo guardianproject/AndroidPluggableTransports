@@ -29,7 +29,7 @@ android {
 
 dependencies {
 
-    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.0'
+    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.1'
 
 
     implementation 'com.android.support:appcompat-v7:27.1.1'
