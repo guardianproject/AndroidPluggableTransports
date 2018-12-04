@@ -1,2 +1,18 @@
 configurations.maybeCreate("default")
 artifacts.add("default", file('goptbundle.aar'))
+
+
+apply plugin: 'maven'
+
+uploadArchives {
+        repositories.mavenDeployer {
+                def deployPath = file(getProperty('aar.deployPath'))
+                repository(url: "file://${deployPath.absolutePath}")
+                pom.project {
+                        groupId 'info.pluggabletransports.aptds'
+                        artifactId 'goptbundle'
+                        version "1.0.0"
+                }
+        }
+}
+
