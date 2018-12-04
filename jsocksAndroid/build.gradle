@@ -16,3 +16,18 @@ android {
         }
     }
 }
+
+apply plugin: 'maven'
+
+uploadArchives {
+        repositories.mavenDeployer {
+                def deployPath = file(getProperty('aar.deployPath'))
+                repository(url: "file://${deployPath.absolutePath}")
+                pom.project {
+                        groupId 'info.pluggabletransports.aptds'
+                        artifactId 'jsocksAndroid'
+                        version "1.0.0"
+                }
+        }
+}
+
