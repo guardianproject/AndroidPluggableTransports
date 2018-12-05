@@ -53,11 +53,11 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
-    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.0'
+    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.1'
+    implementation 'info.pluggabletransports.aptds:apt-meek-obfs4:1.0.0'
 
     implementation("com.squareup.okhttp3:okhttp:3.12.0")
 
     implementation project(path: ':APTDispatchLibrary-SampleTransport')
-    implementation project(path: ':APTDispatchLibrary-MeekObfs4-Full')
 
 }

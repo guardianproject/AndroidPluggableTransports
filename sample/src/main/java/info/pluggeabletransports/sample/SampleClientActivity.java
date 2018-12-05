@@ -56,10 +56,11 @@ public class SampleClientActivity extends AppCompatActivity {
     private String initMeekTransport() {
         new MeekTransport().register();
 
-        Properties options = new Properties();
         String remoteAddress = "en.wikipedia.org:443";// a public Tor guard to test
+        String requestUrl = "https://en.wikipedia.org/index.html";
 
-        options.put(MeekTransport.OPTION_URL,"https://myprivatemeek.azureedge.net/"); //the public Tor Meek endpoint
+        Properties options = new Properties();
+        options.put(MeekTransport.OPTION_URL,"https://myprivatemeek.azureedge.net/"); //a public Meek endpoint
         options.put(MeekTransport.OPTION_FRONT, "ajax.aspnetcdn.com"); //the domain fronting address to use for Azure
         options.put(MeekTransport.OPTION_KEY, "88880DFE9F483596DDA6264C4D7DF7641E1E39CE"); //the unique meek key that is needed for this endpoint
 
@@ -69,14 +70,11 @@ public class SampleClientActivity extends AppCompatActivity {
             //now use the connection, either as a proxy, or to read and write bytes directly
             if (conn.getLocalAddress() != null && conn.getLocalPort() != -1) {
 
-                System.setProperty("socksProxyHost", conn.getLocalAddress().getHostAddress());
-                System.setProperty("socksProxyPort", conn.getLocalPort()+"");
-
                 OkHttpClient client = new OkHttpClient();
 
                 // Create request for remote resource
                 Request request = new Request.Builder()
-                        .url("https://" + remoteAddress)
+                        .url(requestUrl)
                         .build();
 
                 // Execute the request and retrieve the response.
@@ -100,7 +98,8 @@ public class SampleClientActivity extends AppCompatActivity {
                 //or read and write bytes directly!
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
-                    baos.write("GET https://somewebsite.org/TheProject.html HTTP/1.0".getBytes());
+                    String httpGet = "GET " + requestUrl + " HTTP/1.0";
+                    baos.write(httpGet.getBytes());
                     conn.write(baos.toByteArray());
 
                     byte[] buffer = new byte[1024 * 64];
