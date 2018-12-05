@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.runjva.sourceforge.jsocks.protocol.Socks4Proxy;
 import com.runjva.sourceforge.jsocks.protocol.Socks5Proxy;
+import com.runjva.sourceforge.jsocks.protocol.SocksException;
 import com.runjva.sourceforge.jsocks.protocol.SocksSocket;
 import com.runjva.sourceforge.jsocks.protocol.UserPasswordAuthentication;
 
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Properties;
@@ -136,6 +138,21 @@ public class Obfs4Transport implements Transport {
 
 
 
+        }
+
+        public Socket getSocket (String address, int port) throws SocksException, UnknownHostException {
+
+            StringBuffer socksUser = new StringBuffer();
+            socksUser.append(OPTION_KEY).append("\\=").append(mObfs4Key).append("\\;");
+
+            StringBuffer socksPass = new StringBuffer();
+            socksPass.append(NUL_CHAR);
+
+            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
+            UserPasswordAuthentication auth = new UserPasswordAuthentication(socksUser.toString(),socksPass.toString());
+            proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
+            SocksSocket s = new SocksSocket(proxy, address, port);
+            return s;
         }
 
         private void initBridgeViaSocks() throws IOException {
