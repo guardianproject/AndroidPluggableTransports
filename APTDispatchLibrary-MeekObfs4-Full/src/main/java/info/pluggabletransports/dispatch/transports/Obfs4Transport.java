@@ -134,7 +134,7 @@ public class Obfs4Transport implements Transport {
             mLocalAddress = localSocks;
             mLocalPort = port;
 
-            initBridgeViaSocks();
+
 
         }
 
@@ -169,6 +169,10 @@ public class Obfs4Transport implements Transport {
          */
         @Override
         public int read(byte[] b, int offset, int length) throws IOException {
+
+            if (mInputStream == null)
+                initBridgeViaSocks();
+
             return mInputStream.read(b,offset,length);
         }
 
@@ -180,6 +184,9 @@ public class Obfs4Transport implements Transport {
          */
         @Override
         public void write(byte[] b) throws IOException {
+            if (mOutputStream == null)
+                initBridgeViaSocks();
+
             mOutputStream.write(b);
             mOutputStream.flush();
         }

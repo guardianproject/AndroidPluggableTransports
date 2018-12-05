@@ -135,7 +135,6 @@ public class MeekTransport implements Transport {
             mLocalAddress = localSocks;
             mLocalPort = port;
 
-            initBridgeViaSocks();
         }
 
         private void initBridgeViaSocks() throws IOException {
@@ -161,6 +160,8 @@ public class MeekTransport implements Transport {
 
         }
 
+
+
         /**
          * Read from socks socket
          *
@@ -172,6 +173,10 @@ public class MeekTransport implements Transport {
          */
         @Override
         public int read(byte[] b, int offset, int length) throws IOException {
+
+            if (mInputStream == null)
+                initBridgeViaSocks();
+
             return mInputStream.read(b,offset,length);
         }
 
@@ -183,6 +188,11 @@ public class MeekTransport implements Transport {
          */
         @Override
         public void write(byte[] b) throws IOException {
+
+
+            if (mOutputStream == null)
+                initBridgeViaSocks();
+
             mOutputStream.write(b);
             mOutputStream.flush();
         }
