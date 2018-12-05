@@ -33,14 +33,16 @@ dependencies {
 apply plugin: 'maven'
 
 uploadArchives {
+    if (hasProperty('aar.deployPath')) {
         repositories.mavenDeployer {
-                def deployPath = file(getProperty('aar.deployPath'))
-                repository(url: "file://${deployPath.absolutePath}")
-                pom.project {
-                        groupId 'info.pluggabletransports.aptds'
-                        artifactId 'apt-dispatch-library'
-                        version "1.0.1"
-                }
+            def deployPath = file(getProperty('aar.deployPath'))
+            repository(url: "file://${deployPath.absolutePath}")
+            pom.project {
+                groupId 'info.pluggabletransports.aptds'
+                artifactId 'apt-dispatch-library'
+                version "1.0.1"
+            }
         }
+    }
 }
 
