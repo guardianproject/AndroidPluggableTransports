@@ -65,10 +65,6 @@ public class Obfs4Transport implements Transport {
                     StringBuffer cmd = new StringBuffer();
                     cmd.append(mFileTransport.getCanonicalPath()).append(' ');
                     cmd.append("-s ").append(serverAddress).append(' ');
-                    cmd.append("-p ").append(serverPort).append(' ');
-                    cmd.append("-b ").append(localAddress).append(' ');
-                    cmd.append("-l ").append(localPort).append(' ');
-
                     exec(cmd.toString(), false);
 
                 }
