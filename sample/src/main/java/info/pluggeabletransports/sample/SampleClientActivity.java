@@ -98,11 +98,10 @@ public class SampleClientActivity extends AppCompatActivity {
         /**
         //these values come from the public obfs4 endpoint you are running; you can't use Tor's OBFS4 bridges, you need your own
         options.put(Obfs4Transport.OPTION_ADDRESS,"xxx.xxx.xxx.xxx:1234"); //the host:port where the bridge is running
-        options.put(Obfs4Transport.OPTION_KEY,"your obfs4 bridge key goes here"); //looks like: 818AAAC5F85DE83BF63779E578CA32E5AEC2115E
         options.put(Obfs4Transport.OPTION_CERT,"your obfs4 cert value goes here"); //looks like: ApWvCPD2uhjeAgaeS4Lem5PudwHLkmeQfEMMGoOkDJqZoeCq9bzLf/q/oGIggvB0b0VObg
          **/
 
-        String torBridgeLine = "obfs4 72.14.182.23:8888 key cert=x7i6lumoDE5ApW28e8rwqwCwDLhYYYQu8c0ut6vmc9e+P2VV4YQgtN9F+TzSbHJCrD+dLw iat-mode=0";
+        String torBridgeLine = "obfs4 72.14.182.23:8888 key-not-used cert=x7i6lumoDE5ApW28e8rwqwCwDLhYYYQu8c0ut6vmc9e+P2VV4YQgtN9F+TzSbHJCrD+dLw iat-mode=0";
 
         Obfs4Transport.setPropertiesFromBridgeString(options,torBridgeLine);
 
