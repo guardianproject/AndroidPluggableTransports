@@ -8,7 +8,14 @@ import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -17,6 +24,7 @@ import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.transports.MeekTransport;
+import info.pluggabletransports.dispatch.transports.Obfs4Transport;
 import info.pluggabletransports.dispatch.transports.sample.SampleTransport;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -38,9 +46,12 @@ public class SampleClientActivity extends AppCompatActivity {
 
             protected String doInBackground(Void... unused) {
                 // Background Code
-                initMeekTransport();
+                //initMeekTransport();
+
+                String output = initObfs4Transport();
+
              //   initSampleTransport();
-                return null;
+                return output;
             }
 
             protected void onPostExecute(String log) {
@@ -53,62 +64,71 @@ public class SampleClientActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * You will need to run your own Meek server endpoint for this sample to work
+     * Learn how to do that here: https://trac.torproject.org/projects/tor/wiki/doc/meek#Howtorunameek-serverbridge
+     */
     private String initMeekTransport() {
         new MeekTransport().register();
-
-        String remoteAddress = "en.wikipedia.org:443";// a public Tor guard to test
-        String requestUrl = "https://en.wikipedia.org/index.html";
 
         Properties options = new Properties();
         options.put(MeekTransport.OPTION_URL,"https://myprivatemeek.azureedge.net/"); //a public Meek endpoint
         options.put(MeekTransport.OPTION_FRONT, "ajax.aspnetcdn.com"); //the domain fronting address to use for Azure
         options.put(MeekTransport.OPTION_KEY, "88880DFE9F483596DDA6264C4D7DF7641E1E39CE"); //the unique meek key that is needed for this endpoint
 
-        Connection conn = init(DispatchConstants.PT_TRANSPORTS_MEEK, remoteAddress, options);
+        Connection conn = null;
+        Transport transport = Dispatcher.get().getTransport(this, DispatchConstants.PT_TRANSPORTS_MEEK, options);
+        if (transport != null)
+            conn = transport.connect(options.getProperty(MeekTransport.OPTION_FRONT));
 
         if (conn != null) {
             //now use the connection, either as a proxy, or to read and write bytes directly
             if (conn.getLocalAddress() != null && conn.getLocalPort() != -1) {
 
-                OkHttpClient client = new OkHttpClient();
-
-                // Create request for remote resource
-                Request request = new Request.Builder()
-                        .url(requestUrl)
-                        .build();
-
-                // Execute the request and retrieve the response.
-                Response response = null;
-                try {
-                    response = client.newCall(request).execute();
-
-                    // Deserialize HTTP response to concrete type.
-                    ResponseBody body = response.body();
-
-                    Log.d("Sample","Got page via Meek: " + body);
-
-                    return body.toString();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
             }
-            else {
 
-                //or read and write bytes directly!
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        }
+
+        return null;
+    }
+
+    /**
+     * You will need to run your own Obfs4 server bridge for this to work.
+     * Learn more at: https://tor.stackexchange.com/questions/6370/how-to-run-an-obfs4-bridge
+     * and http://manpages.ubuntu.com/manpages/xenial/man1/obfs4proxy.1.html
+     * @return
+     */
+    private String initObfs4Transport() {
+        new Obfs4Transport().register();
+
+        Properties options = new Properties();
+
+        /**
+        //these values come from the public obfs4 endpoint you are running; you can't use Tor's OBFS4 bridges, you need your own
+        options.put(Obfs4Transport.OPTION_ADDRESS,"xxx.xxx.xxx.xxx:1234"); //the host:port where the bridge is running
+        options.put(Obfs4Transport.OPTION_KEY,"your obfs4 bridge key goes here"); //looks like: 818AAAC5F85DE83BF63779E578CA32E5AEC2115E
+        options.put(Obfs4Transport.OPTION_CERT,"your obfs4 cert value goes here"); //looks like: ApWvCPD2uhjeAgaeS4Lem5PudwHLkmeQfEMMGoOkDJqZoeCq9bzLf/q/oGIggvB0b0VObg
+         **/
+
+        String torBridgeLine = "obfs4 174.128.247.178:443 818AAAC5F85DE83BF63779E578CA32E5AEC2115E cert=ApWvCPD2uhjeAgaeS4Lem5PudwHLkmeQfEMMGoOkDJqZoeCq9bzLf/q/oGIggvB0b0VObg iat-mode=0";
+
+        Obfs4Transport.setPropertiesFromBridgeString(options,torBridgeLine);
+
+        Transport transport = Dispatcher.get().getTransport(this, DispatchConstants.PT_TRANSPORTS_OBFS4, options);
+        if (transport != null) {
+            final Obfs4Transport.Obfs4Connection ptConn = (Obfs4Transport.Obfs4Connection) transport.connect(options.getProperty(Obfs4Transport.OPTION_ADDRESS));
+
+            if (ptConn != null) {
+
                 try {
-                    String httpGet = "GET " + requestUrl + " HTTP/1.0";
-                    baos.write(httpGet.getBytes());
-                    conn.write(baos.toByteArray());
-
-                    byte[] buffer = new byte[1024 * 64];
-                    int read = conn.read(buffer, 0, buffer.length);
-                    String response = new String(buffer);
-
+                    ptConn.write("Hello".getBytes());
+                    byte[] resp = new byte[1];
+                    ptConn.read(resp,0,1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+
             }
         }
 
@@ -118,11 +138,15 @@ public class SampleClientActivity extends AppCompatActivity {
     private void initSampleTransport() {
         new SampleTransport().register();
 
-        String bridgeAddress = "somecrazyaddress";
+        String remoteAddress = "somecrazyaddress";
         Properties options = new Properties();
         options.put(SampleTransport.SAMPLE_SPECIAL_OPTION, "thesecret");
 
-        Connection conn = init("sample", bridgeAddress, options);
+        Connection conn = null;
+        Transport transport = Dispatcher.get().getTransport(this, "sample", options);
+
+        if (transport != null)
+            conn = transport.connect(remoteAddress);
 
         if (conn != null) {
             //now use the connection, either as a proxy, or to read and write bytes directly
@@ -147,18 +171,6 @@ public class SampleClientActivity extends AppCompatActivity {
         }
     }
 
-    public Connection init(String type, String remoteAddress, Properties options) {
-        Transport transport = Dispatcher.get().getTransport(this, type, options);
-
-        if (transport != null) {
-            Connection conn = transport.connect(remoteAddress);
-
-            return conn;
-
-        }
-
-        return null;
-    }
 
     private void setSocksProxy(InetAddress localSocks, int socksPort) {
         //do what you need here to proxy
