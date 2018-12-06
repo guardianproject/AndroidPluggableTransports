@@ -110,7 +110,7 @@ public class MeekTransport implements Transport {
 
         try {
             Goptbundle.setenv(DispatchConstants.TOR_PT_LOG_LEVEL, "DEBUG");
-            Goptbundle.setenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, "meek_lite");
+            Goptbundle.setenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, DispatchConstants.PT_TRANSPORTS_MEEK);
             Goptbundle.setenv(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
             Goptbundle.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0");
         } catch (Exception e) {
