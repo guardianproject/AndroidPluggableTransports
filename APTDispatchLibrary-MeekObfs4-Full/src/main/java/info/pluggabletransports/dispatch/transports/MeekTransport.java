@@ -175,6 +175,7 @@ public class MeekTransport implements Transport {
             socksPass.append(NUL_CHAR);
 
             Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
+            proxy.resolveAddrLocally(false);
             UserPasswordAuthentication auth = new UserPasswordAuthentication(socksUser.toString(),socksPass.toString());
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
             SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);

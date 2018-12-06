@@ -20,6 +20,8 @@ import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +44,7 @@ public class Obfs4Transport implements Transport {
     public final static String OPTION_KEY = "key";
     public final static String OPTION_ADDRESS = "address";
 
-    private int mLocalSocksPort = -1;
+    private int mLocalSocksPort = 47351;
 
     private String mPtStateDir;
 
@@ -91,7 +93,7 @@ public class Obfs4Transport implements Transport {
         exec(new Runnable() { public void run () { Goptbundle.load(mPtStateDir); } });
         exec(new Runnable() { public void run () {
 
-            String line = getLogLine("socks5",100);
+            String line = getLogLine("CMETHOD obfs4 socks5",1000);
             //         CMETHOD trebuchet socks5 127.0.0.1:19999
 
             if (!TextUtils.isEmpty(line))
@@ -191,13 +193,9 @@ public class Obfs4Transport implements Transport {
             //connect to SOCKS port and pass the values appropriately to configure meek
             //see: https://gitweb.torproject.org/torspec.git/tree/pt-spec.txt#n628
 
-            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
-            UserPasswordAuthentication auth = new UserPasswordAuthentication(getProxyUsername(),getProxyPassword());
-            proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
-            SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);
-
-            mInputStream = s.getInputStream();
-            mOutputStream = s.getOutputStream();
+            Socket s = getSocket(mRemoteAddress, mRemotePort);
+            mInputStream = new BufferedInputStream(s.getInputStream());
+            mOutputStream = new BufferedOutputStream(s.getOutputStream());
 
         }
 
