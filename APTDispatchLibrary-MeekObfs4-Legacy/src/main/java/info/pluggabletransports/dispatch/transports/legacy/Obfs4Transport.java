@@ -31,12 +31,12 @@ import static info.pluggabletransports.dispatch.DispatchConstants.TAG;
 
 public class Obfs4Transport implements Transport {
 
-    public final static String OPTION_KEY = "key";
+    public final static String OPTION_CERT = "cert";
 
     private int mLocalSocksPort = -1;
 
     private String mPtStateDir;
-    private String mObfs4Key;
+    private String mCert;
 
     private final static String NUL_CHAR = "\u0000";
 
@@ -56,15 +56,9 @@ public class Obfs4Transport implements Transport {
             {
                 try {
 
-                    String serverAddress = "172.104.48.102";
-                    String serverPort = "443";
-
-                    String localAddress = "127.0.0.1";
-                    String localPort = "31059";
 
                     StringBuffer cmd = new StringBuffer();
                     cmd.append(mFileTransport.getCanonicalPath()).append(' ');
-                    cmd.append("-s ").append(serverAddress).append(' ');
                     exec(cmd.toString(), false);
 
                 }
@@ -80,7 +74,7 @@ public class Obfs4Transport implements Transport {
 
         mPtStateDir = context.getDir("pt-state", Context.MODE_PRIVATE).getAbsolutePath();
 
-        mObfs4Key = options.getProperty(OPTION_KEY);
+        mCert = options.getProperty(OPTION_CERT);
     }
 
     @Override
@@ -149,7 +143,7 @@ public class Obfs4Transport implements Transport {
             //see: https://gitweb.torproject.org/torspec.git/tree/pt-spec.txt#n628
 
             StringBuffer socksUser = new StringBuffer();
-            socksUser.append(OPTION_KEY).append("\\=").append(mObfs4Key).append("\\;");
+            socksUser.append(OPTION_CERT).append("\\=").append(mCert).append("\\;");
 
             StringBuffer socksPass = new StringBuffer();
             socksPass.append(NUL_CHAR);

@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 
+import com.runjva.sourceforge.jsocks.protocol.AuthenticationNone;
 import com.runjva.sourceforge.jsocks.protocol.Socks4Proxy;
 import com.runjva.sourceforge.jsocks.protocol.Socks5Proxy;
 import com.runjva.sourceforge.jsocks.protocol.SocksException;
@@ -41,17 +42,15 @@ public class Obfs4Transport implements Transport {
 
     public final static String OPTION_CERT = "cert";
     public final static String OPTION_IAT_MODE = "iat-mode";
-    public final static String OPTION_KEY = "key";
     public final static String OPTION_ADDRESS = "address";
 
+    private String mLocalSocksHost = "127.0.0.1";
+    //this is the default local socks port
     private int mLocalSocksPort = 47351;
 
     private String mPtStateDir;
 
-    private String mObfs4Host;
-    private int mObfs4Port;
     private String mObfs4Cert;
-    private String mObfs4Key;
 
     private String mIatMode = "0";
 
@@ -70,15 +69,7 @@ public class Obfs4Transport implements Transport {
 
         mPtStateDir = context.getDir("pt-state", Context.MODE_PRIVATE).getAbsolutePath();
 
-        if (options.containsKey(OPTION_ADDRESS))
-        {
-            String[] addrParts = options.getProperty(OPTION_ADDRESS).split(":");
-            mObfs4Host = addrParts[0];
-            mObfs4Port = Integer.parseInt(addrParts[1]);
-        }
-
         mObfs4Cert = options.getProperty(OPTION_CERT);
-        mObfs4Key = options.getProperty(OPTION_KEY);
 
         if (options.containsKey(OPTION_IAT_MODE))
             mIatMode = options.getProperty(OPTION_IAT_MODE);
@@ -91,6 +82,8 @@ public class Obfs4Transport implements Transport {
 
         //let's start the transport in it's own thread
         exec(new Runnable() { public void run () { Goptbundle.load(mPtStateDir); } });
+
+        //now look for the socks port in the log output
         exec(new Runnable() { public void run () {
 
             String line = getLogLine("CMETHOD obfs4 socks5",1000);
@@ -102,6 +95,7 @@ public class Obfs4Transport implements Transport {
                 for (String part : parts) {
                     if (part.contains("127.0.0.1")) {
                         String[] addrParts = part.split(":");
+                        mLocalSocksHost = addrParts[0];
                         mLocalSocksPort = Integer.parseInt(addrParts[1]);
                         break;
                     }
@@ -152,13 +146,13 @@ public class Obfs4Transport implements Transport {
         private InputStream mInputStream;
         private OutputStream mOutputStream;
 
-        public Obfs4Connection(String remoteAddress, InetAddress localSocks, int port) throws IOException {
+        public Obfs4Connection(String remoteAddress, InetAddress localAddress, int localPort) throws IOException {
 
-            String[] addressparts = remoteAddress.split(":");
-            mRemoteAddress = addressparts[0];
-            mRemotePort = Integer.parseInt(addressparts[1]);
-            mLocalAddress = localSocks;
-            mLocalPort = port;
+            String[] addrParts = remoteAddress.split(":");
+            mRemoteAddress = addrParts[0];
+            mRemotePort = Integer.parseInt(addrParts[1]);
+            mLocalAddress = localAddress;
+            mLocalPort = localPort;
 
         }
 
@@ -166,7 +160,6 @@ public class Obfs4Transport implements Transport {
         {
             StringBuffer socksUser = new StringBuffer();
 
-            socksUser.append(OPTION_KEY).append("\\=").append(mObfs4Key).append("\\;");
             socksUser.append(OPTION_CERT).append("\\=").append(mObfs4Cert).append("\\;");
             socksUser.append(OPTION_IAT_MODE).append("\\=").append(mIatMode).append("\\;");
 
@@ -184,6 +177,7 @@ public class Obfs4Transport implements Transport {
 
             Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
             UserPasswordAuthentication auth = new UserPasswordAuthentication(getProxyUsername(),getProxyPassword());
+            proxy.setAuthenticationMethod(0,null);
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
             SocksSocket s = new SocksSocket(proxy, address, port);
             return s;
@@ -319,7 +313,6 @@ public class Obfs4Transport implements Transport {
         String[] parts = bridgeLine.split(" ");
 
         options.put(Obfs4Transport.OPTION_ADDRESS,parts[1]);
-        options.put(Obfs4Transport.OPTION_KEY,parts[2]);
         options.put(Obfs4Transport.OPTION_CERT,parts[3].split("=")[1]);
         options.put(Obfs4Transport.OPTION_IAT_MODE,parts[4].split("=")[1]);
 
