@@ -33,7 +33,7 @@ public interface DispatchConstants {
     public final static String PT_SERVER_PROXY_LISTEN_ADDR = "proxylistenaddr"; //Specify the bind address for the local SOCKS server provided by the client
 
     // APT-DS implemented transports
-    public final static String PT_TRANSPORTS_MEEK = "meek-lite";
+    public final static String PT_TRANSPORTS_MEEK = "meek_lite";
     public final static String PT_TRANSPORTS_OBFS4 = "obfs4";
     public final static String PT_TRANSPORTS_SHADOWSOCKS = "ss";
     public final static String PT_TRANSPORTS_SNOWFLAKE = "snowflake";
