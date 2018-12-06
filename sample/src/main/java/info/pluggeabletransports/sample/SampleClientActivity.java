@@ -3,20 +3,9 @@ package info.pluggeabletransports.sample;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.TextView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Collections;
 import java.util.Properties;
 
 import info.pluggabletransports.dispatch.Connection;
@@ -25,11 +14,6 @@ import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Transport;
 import info.pluggabletransports.dispatch.transports.MeekTransport;
 import info.pluggabletransports.dispatch.transports.Obfs4Transport;
-import info.pluggabletransports.dispatch.transports.sample.SampleTransport;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class SampleClientActivity extends AppCompatActivity {
 
@@ -46,12 +30,13 @@ public class SampleClientActivity extends AppCompatActivity {
 
             protected String doInBackground(Void... unused) {
                 // Background Code
-                //initMeekTransport();
 
-                String output = initObfs4Transport();
+//                return initMeekTransport();
+
+                  return initObfs4Transport();
 
              //   initSampleTransport();
-                return output;
+
             }
 
             protected void onPostExecute(String log) {
@@ -71,20 +56,27 @@ public class SampleClientActivity extends AppCompatActivity {
     private String initMeekTransport() {
         new MeekTransport().register();
 
+        String address = "0.0.2.0:2";
         Properties options = new Properties();
-        options.put(MeekTransport.OPTION_URL,"https://myprivatemeek.azureedge.net/"); //a public Meek endpoint
+        options.put(MeekTransport.OPTION_URL,"https://meek.azureedge.net/"); //a public Meek endpoint
         options.put(MeekTransport.OPTION_FRONT, "ajax.aspnetcdn.com"); //the domain fronting address to use for Azure
-        options.put(MeekTransport.OPTION_KEY, "88880DFE9F483596DDA6264C4D7DF7641E1E39CE"); //the unique meek key that is needed for this endpoint
+        options.put(MeekTransport.OPTION_KEY, "97700DFE9F483596DDA6264C4D7DF7641E1E39CE"); //the unique meek key that is needed for this endpoint
 
-        Connection conn = null;
+        Connection ptConn = null;
         Transport transport = Dispatcher.get().getTransport(this, DispatchConstants.PT_TRANSPORTS_MEEK, options);
         if (transport != null)
-            conn = transport.connect(options.getProperty(MeekTransport.OPTION_FRONT));
+            ptConn = transport.connect(address);
 
-        if (conn != null) {
+        if (ptConn != null) {
             //now use the connection, either as a proxy, or to read and write bytes directly
-            if (conn.getLocalAddress() != null && conn.getLocalPort() != -1) {
-
+            if (ptConn.getLocalAddress() != null && ptConn.getLocalPort() != -1) {
+                try {
+                    ptConn.write("Hello".getBytes());
+                    byte[] resp = new byte[1];
+                    ptConn.read(resp,0,1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -110,7 +102,7 @@ public class SampleClientActivity extends AppCompatActivity {
         options.put(Obfs4Transport.OPTION_CERT,"your obfs4 cert value goes here"); //looks like: ApWvCPD2uhjeAgaeS4Lem5PudwHLkmeQfEMMGoOkDJqZoeCq9bzLf/q/oGIggvB0b0VObg
          **/
 
-        String torBridgeLine = "obfs4 174.128.247.178:443 818AAAC5F85DE83BF63779E578CA32E5AEC2115E cert=ApWvCPD2uhjeAgaeS4Lem5PudwHLkmeQfEMMGoOkDJqZoeCq9bzLf/q/oGIggvB0b0VObg iat-mode=0";
+        String torBridgeLine = "obfs4 72.14.182.23:8888 key cert=x7i6lumoDE5ApW28e8rwqwCwDLhYYYQu8c0ut6vmc9e+P2VV4YQgtN9F+TzSbHJCrD+dLw iat-mode=0";
 
         Obfs4Transport.setPropertiesFromBridgeString(options,torBridgeLine);
 
@@ -135,6 +127,7 @@ public class SampleClientActivity extends AppCompatActivity {
         return null;
     }
 
+    /**
     private void initSampleTransport() {
         new SampleTransport().register();
 
@@ -169,10 +162,6 @@ public class SampleClientActivity extends AppCompatActivity {
                 }
             }
         }
-    }
+    }**/
 
-
-    private void setSocksProxy(InetAddress localSocks, int socksPort) {
-        //do what you need here to proxy
-    }
 }
