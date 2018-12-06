@@ -66,4 +66,16 @@ Step 2. Add the dependency
 	        compile 'com.github.guardianproject:AndroidPluggableTransportsDispatcher:-SNAPSHOT'
 	}
 
+### Notices
 
+Obfs4proxy is Copyright (c) 2014, Yawning Angel <yawning at torproject dot org>
+All rights reserved.
+https://github.com/Yawning/obfs4/
+
+### Thanks
+
+ * Yawning Angel for obfs4proxy.
+ * David Fifield for goptlib.
+ * Adam Langley for his Elligator implementation.
+ * Philipp Winter for the ScrambleSuit protocol which provided much of the
+   design.
