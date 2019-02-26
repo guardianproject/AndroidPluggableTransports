@@ -27,10 +27,11 @@ android {
 
 dependencies {
     implementation project(path: ':APTDispatchLibrary')
+    implementation project(path: ':jsocksAndroid')
 
    // implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.1'
     implementation 'info.pluggabletransports.aptds:goptbundle:1.0.0'
-    implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.0'
+   // implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.0'
 
 }
 

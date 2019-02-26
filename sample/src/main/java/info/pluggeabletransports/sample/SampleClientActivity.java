@@ -1,8 +1,9 @@
 package info.pluggeabletransports.sample;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -12,15 +13,21 @@ import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Transport;
-import info.pluggabletransports.dispatch.transports.MeekTransport;
-import info.pluggabletransports.dispatch.transports.Obfs4Transport;
+import info.pluggabletransports.dispatch.transports.legacy.MeekTransport;
+import info.pluggabletransports.dispatch.transports.legacy.Obfs4Transport;
 
-public class SampleClientActivity extends AppCompatActivity {
+public class SampleClientActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample_client);
+
+
+    }
+
+    public void connectClicked (View view)
+    {
 
         // The Very Basic
         new AsyncTask<Void, Void, String>() {
@@ -31,11 +38,10 @@ public class SampleClientActivity extends AppCompatActivity {
             protected String doInBackground(Void... unused) {
                 // Background Code
 
-//                return initMeekTransport();
+              //  return initMeekTransport();
 
-                  return initObfs4Transport();
-
-             //   initSampleTransport();
+                return initObfs4Transport();
+                //   initSampleTransport();
 
             }
 
@@ -43,10 +49,10 @@ public class SampleClientActivity extends AppCompatActivity {
                 // Post Code
                 if (log != null)
                     ((TextView)findViewById(R.id.response)).setText(log);
-
+                else
+                    ((TextView)findViewById(R.id.response)).setText("An error occured");
             }
         }.execute();
-
     }
 
     /**
@@ -102,17 +108,17 @@ public class SampleClientActivity extends AppCompatActivity {
          **/
 
         String torBridgeLine = "obfs4 72.14.182.23:8888 key-not-used cert=x7i6lumoDE5ApW28e8rwqwCwDLhYYYQu8c0ut6vmc9e+P2VV4YQgtN9F+TzSbHJCrD+dLw iat-mode=0";
-
         Obfs4Transport.setPropertiesFromBridgeString(options,torBridgeLine);
 
         Transport transport = Dispatcher.get().getTransport(this, DispatchConstants.PT_TRANSPORTS_OBFS4, options);
         if (transport != null) {
-            final Obfs4Transport.Obfs4Connection ptConn = (Obfs4Transport.Obfs4Connection) transport.connect(options.getProperty(Obfs4Transport.OPTION_ADDRESS));
+
+            Connection ptConn = transport.connect("72.14.182.23:8888");
 
             if (ptConn != null) {
 
                 try {
-                    ptConn.write("Hello".getBytes());
+                    ptConn.write("GET /index.html HTTP/1.0".getBytes());
                     byte[] resp = new byte[1];
                     ptConn.read(resp,0,1);
                 } catch (IOException e) {

@@ -58,7 +58,8 @@ dependencies {
 
     implementation project(path: ':APTDispatchLibrary')
 
-    implementation project(path: ':APTDispatchLibrary-MeekObfs4-Full')
+ //   implementation project(path: ':APTDispatchLibrary-MeekObfs4-Full')
+    implementation project(path: ':APTDispatchLibrary-MeekObfs4-Legacy')
 
  //   implementation project(path: ':APTDispatchLibrary-SampleTransport')
 

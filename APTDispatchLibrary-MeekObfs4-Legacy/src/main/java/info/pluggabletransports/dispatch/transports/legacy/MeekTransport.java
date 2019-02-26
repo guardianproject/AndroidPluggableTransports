@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Properties;
@@ -19,9 +20,11 @@ import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
+import info.pluggabletransports.dispatch.util.TransportListener;
 import info.pluggabletransports.dispatch.util.TransportManager;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
+import static info.pluggabletransports.dispatch.DispatchConstants.TAG;
 
 public class MeekTransport implements Transport {
 
@@ -50,7 +53,7 @@ public class MeekTransport implements Transport {
     public void init(Context context, Properties options) {
 
         mTransportManager = new TransportManager() {
-            public  void startTransportSync ()
+            public  void startTransportSync (TransportListener listener)
             {
                 try {
 
@@ -67,12 +70,16 @@ public class MeekTransport implements Transport {
                     cmd.append("-b ").append(localAddress).append(' ');
                     cmd.append("-l ").append(localPort).append(' ');
 
-                    exec(cmd.toString(), false);
+                    exec(cmd.toString(), false, null,listener);
+
 
                 }
                 catch (Exception ioe)
                 {
                     debug("Couldn't install transport: " + ioe);
+
+                    if (listener != null)
+                        listener.transportFailed("Couldn't install transport: " + ioe.getMessage());
                 }
             }
 
@@ -91,7 +98,22 @@ public class MeekTransport implements Transport {
     public Connection connect(String addr) {
 
 
-        mTransportManager.startTransport();
+        mTransportManager.startTransport(new TransportListener() {
+            @Override
+            public void transportStarted(int localPort) {
+                mLocalSocksPort = localPort;
+            }
+
+            @Override
+            public void transportFailed(String err) {
+                Log.d(TAG,"error starting transport: " + err);
+            }
+        });
+
+        while (mLocalSocksPort == -1)
+        {
+            try { Thread.sleep(500);}catch(Exception e){}
+        }
 
         try {
             return new MeekConnection(addr, InetAddress.getLocalHost(), mLocalSocksPort);
@@ -235,6 +257,11 @@ public class MeekTransport implements Transport {
         @Override
         public void setWriteDeadline(Date deadlineTime) {
 
+        }
+
+        @Override
+        public Socket getSocket(String address, int port) throws IOException {
+            return null;
         }
     }
 }

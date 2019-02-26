@@ -69,27 +69,27 @@ public class MeekTransport implements Transport {
 
         //let's start the transport in it's own thread
         exec(new Runnable() { public void run () { Goptbundle.load(mPtStateDir); } });
-        exec(new Runnable() { public void run () {
 
-            String line = getLogLine("socks5",100);
-            //         CMETHOD trebuchet socks5 127.0.0.1:19999
+        String line = getLogLine("socks5",100);
+        //         CMETHOD trebuchet socks5 127.0.0.1:19999
 
-            if (!TextUtils.isEmpty(line))
-            {
-                String[] parts = line.split(" ");
-                for (String part : parts) {
-                    if (part.contains("127.0.0.1")) {
-                        String[] addrParts = part.split(":");
-                        mLocalSocksPort = Integer.parseInt(addrParts[1]);
-                        break;
-                    }
+        if (!TextUtils.isEmpty(line))
+        {
+            String[] parts = line.split(" ");
+            for (String part : parts) {
+                if (part.contains("127.0.0.1")) {
+                    String[] addrParts = part.split(":");
+                    mLocalSocksPort = Integer.parseInt(addrParts[1]);
+                    break;
                 }
             }
-
-        } });
+        }
 
         try {
-            return new MeekConnection(addr, InetAddress.getLocalHost(), mLocalSocksPort);
+
+            InetAddress localHost = InetAddress.getByName("127.0.0.1");
+            return new MeekConnection(addr, localHost, mLocalSocksPort);
+
         } catch (IOException e) {
             Log.e(getClass().getName(),"Error making connection",e);
             return null;
@@ -166,19 +166,17 @@ public class MeekTransport implements Transport {
             //see: https://gitweb.torproject.org/torspec.git/tree/pt-spec.txt#n628
 
             StringBuffer socksUser = new StringBuffer();
-
             socksUser.append(OPTION_URL).append("\\=").append(mMeekUrl).append("\\;");
             socksUser.append(OPTION_FRONT).append("\\=").append(mMeekFrontDomain).append("\\;");
             socksUser.append(OPTION_KEY).append("\\=").append(mMeekKey).append("\\;");
 
-            StringBuffer socksPass = new StringBuffer();
-            socksPass.append(NUL_CHAR);
-
             Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
             proxy.resolveAddrLocally(false);
-            UserPasswordAuthentication auth = new UserPasswordAuthentication(socksUser.toString(),socksPass.toString());
+
+            UserPasswordAuthentication auth = new UserPasswordAuthentication(socksUser.toString(),NUL_CHAR);
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
-            SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);
+            proxy.setAuthenticationMethod(0,null);
+            SocksSocket s = new SocksSocket(proxy, mMeekFrontDomain, 443);
 
             mInputStream = s.getInputStream();
             mOutputStream = s.getOutputStream();

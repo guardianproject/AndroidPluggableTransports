@@ -194,7 +194,6 @@ public class Socks5Proxy extends SocksProxyBase implements Cloneable {
     */
 	protected void startSession() throws SocksException {
 		super.startSession();
-		Authentication auth;
 		final Socket ps = proxySocket; // The name is too long
 
 		try {
@@ -209,14 +208,17 @@ public class Socks5Proxy extends SocksProxyBase implements Cloneable {
 
 			final Enumeration<Integer> ids = authMethods.keys();
 			while (ids.hasMoreElements()) {
-				buf[i++] = (byte) ids.nextElement().intValue();
+				buf[i++] = ids.nextElement().byteValue();
 			}
 
 			out.write(buf);
-			out.flush();
 
 			final int versionNumber = in.read();
 			selectedMethod = in.read();
+
+			//use default
+			if (selectedMethod == -1)
+			    selectedMethod = authMethods.keys().nextElement().intValue();
 
 			if ((versionNumber < 0) || (selectedMethod < 0)) {
 				// EOF condition was reached
@@ -234,7 +236,7 @@ public class Socks5Proxy extends SocksProxyBase implements Cloneable {
 				throw (new SocksException(SOCKS_AUTH_NOT_SUPPORTED));
 			}
 
-			auth = getAuthenticationMethod(selectedMethod);
+			Authentication auth = getAuthenticationMethod(selectedMethod);
 			if (auth == null) {
 				// This shouldn't happen, unless method was removed by other
 				// thread, or the server stuffed up
@@ -262,6 +264,7 @@ public class Socks5Proxy extends SocksProxyBase implements Cloneable {
 			if (in_out.length > 2) {
 				udp_encapsulation = (UDPEncapsulation) in_out[2];
 			}
+
 
 		} catch (final SocksException s_ex) {
 			throw s_ex;

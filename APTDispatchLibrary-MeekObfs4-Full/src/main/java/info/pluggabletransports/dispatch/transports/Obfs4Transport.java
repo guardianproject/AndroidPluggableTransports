@@ -24,6 +24,7 @@ import info.pluggabletransports.dispatch.Transport;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,8 +46,7 @@ public class Obfs4Transport implements Transport {
     public final static String OPTION_ADDRESS = "address";
 
     private String mLocalSocksHost = "127.0.0.1";
-    //this is the default local socks port
-    private int mLocalSocksPort = 47351;
+    private int mLocalSocksPort = -1;
 
     private String mPtStateDir;
 
@@ -67,7 +67,11 @@ public class Obfs4Transport implements Transport {
 
         initObfs4SharedLibrary(context);
 
-        mPtStateDir = context.getDir("pt-state", Context.MODE_PRIVATE).getAbsolutePath();
+        File fileCache = context.getDir("pt-cache",Context.MODE_PRIVATE);
+        if (!fileCache.exists())
+            fileCache.mkdirs();
+
+        mPtStateDir = fileCache.getAbsolutePath();
 
         mObfs4Cert = options.getProperty(OPTION_CERT);
 
@@ -80,30 +84,23 @@ public class Obfs4Transport implements Transport {
     @Override
     public Connection connect(final String addr) {
 
-        //let's start the transport in it's own thread
-        exec(new Runnable() { public void run () { Goptbundle.load(mPtStateDir); } });
+        Goptbundle.load(mPtStateDir);
 
-        //now look for the socks port in the log output
-        exec(new Runnable() { public void run () {
+        String line = getLogLine("CMETHOD obfs4 socks5",1000);
+        //         CMETHOD trebuchet socks5 127.0.0.1:19999
 
-            String line = getLogLine("CMETHOD obfs4 socks5",1000);
-            //         CMETHOD trebuchet socks5 127.0.0.1:19999
-
-            if (!TextUtils.isEmpty(line))
-            {
-                String[] parts = line.split(" ");
-                for (String part : parts) {
-                    if (part.contains("127.0.0.1")) {
-                        String[] addrParts = part.split(":");
-                        mLocalSocksHost = addrParts[0];
-                        mLocalSocksPort = Integer.parseInt(addrParts[1]);
-                        break;
-                    }
+        if (!TextUtils.isEmpty(line))
+        {
+            String[] parts = line.split(" ");
+            for (String part : parts) {
+                if (part.contains("127.0.0.1")) {
+                    String[] addrParts = part.split(":");
+                    mLocalSocksHost = addrParts[0];
+                    mLocalSocksPort = Integer.parseInt(addrParts[1]);
+                    break;
                 }
             }
-
-        } });
-
+        }
 
         try {
             return new Obfs4Connection(addr, InetAddress.getLocalHost(), mLocalSocksPort);
@@ -129,7 +126,9 @@ public class Obfs4Transport implements Transport {
             Goptbundle.setenv(DispatchConstants.TOR_PT_LOG_LEVEL, "DEBUG");
             Goptbundle.setenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, DispatchConstants.PT_TRANSPORTS_OBFS4);
             Goptbundle.setenv(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
-            Goptbundle.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0");
+            Goptbundle.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0"); //we don't want it to close!
+            Goptbundle.setenv(DispatchConstants.TOR_PT_STATE_LOCATION,mPtStateDir);
+
         } catch (Exception e) {
             Log.e(getClass().getName(), "Error setting env variables", e);
         }
@@ -160,8 +159,8 @@ public class Obfs4Transport implements Transport {
         {
             StringBuffer socksUser = new StringBuffer();
 
-            socksUser.append(OPTION_CERT).append("\\=").append(mObfs4Cert).append("\\;");
-            socksUser.append(OPTION_IAT_MODE).append("\\=").append(mIatMode).append("\\;");
+            socksUser.append(OPTION_CERT).append("=").append(mObfs4Cert).append(";");
+            socksUser.append(OPTION_IAT_MODE).append("=").append(mIatMode);
 
             return socksUser.toString();
         }
@@ -173,13 +172,16 @@ public class Obfs4Transport implements Transport {
             return socksPass.toString();
         }
 
-        public Socket getSocket (String address, int port) throws SocksException, UnknownHostException {
+        public Socket getSocket (String remoteAddress, int remotePort) throws SocksException, UnknownHostException {
 
             Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
+
             UserPasswordAuthentication auth = new UserPasswordAuthentication(getProxyUsername(),getProxyPassword());
             proxy.setAuthenticationMethod(0,null);
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
-            SocksSocket s = new SocksSocket(proxy, address, port);
+
+            SocksSocket s = new SocksSocket(proxy, remoteAddress, remotePort);
+
             return s;
         }
 

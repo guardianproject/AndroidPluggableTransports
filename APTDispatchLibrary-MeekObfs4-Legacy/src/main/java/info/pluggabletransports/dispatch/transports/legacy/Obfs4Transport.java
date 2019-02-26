@@ -1,11 +1,13 @@
 package info.pluggabletransports.dispatch.transports.legacy;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 
 import com.runjva.sourceforge.jsocks.protocol.Socks4Proxy;
 import com.runjva.sourceforge.jsocks.protocol.Socks5Proxy;
+import com.runjva.sourceforge.jsocks.protocol.SocksException;
 import com.runjva.sourceforge.jsocks.protocol.SocksSocket;
 import com.runjva.sourceforge.jsocks.protocol.UserPasswordAuthentication;
 
@@ -14,15 +16,20 @@ import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
 import info.pluggabletransports.dispatch.Listener;
 import info.pluggabletransports.dispatch.Transport;
+import info.pluggabletransports.dispatch.util.TransportListener;
 import info.pluggabletransports.dispatch.util.TransportManager;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Properties;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
@@ -37,34 +44,51 @@ public class Obfs4Transport implements Transport {
 
     private String mPtStateDir;
     private String mCert;
+    private String mIatMode;
 
-    private final static String NUL_CHAR = "\u0000";
+    private final static char NUL_CHAR = '\u0000';
 
     private TransportManager mTransportManager;
-    private final static String ASSET_KEY = "obfs4";
+    private final static String ASSET_KEY = "obfs4proxy";
 
+    public final static String OPTION_IAT_MODE = "iat-mode";
+    public final static String OPTION_ADDRESS = "address";
     @Override
     public void register() {
         Dispatcher.get().register(PT_TRANSPORTS_OBFS4, getClass());
     }
 
     @Override
-    public void init(Context context, Properties options) {
+    public void init(final Context context, Properties options) {
 
         mTransportManager = new TransportManager() {
-            public  void startTransportSync ()
+            public  void startTransportSync (TransportListener listener)
             {
                 try {
 
 
                     StringBuffer cmd = new StringBuffer();
-                    cmd.append(mFileTransport.getCanonicalPath()).append(' ');
-                    exec(cmd.toString(), false);
+                    cmd.append(mFileTransport.getCanonicalPath());
+
+                    HashMap<String,String> env = new HashMap<>();
+
+                    env.put(DispatchConstants.TOR_PT_LOG_LEVEL, "DEBUG");
+                    env.put(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, DispatchConstants.PT_TRANSPORTS_OBFS4);
+                    env.put(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
+                    env.put(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "1");
+                    env.put(DispatchConstants.TOR_PT_STATE_LOCATION,context.getDir("pt-cache",Context.MODE_PRIVATE).getCanonicalPath());
+
+                    exec(cmd.toString(), false, env, listener);
+
+
 
                 }
                 catch (Exception ioe)
                 {
                     debug("Couldn't install transport: " + ioe);
+
+                    if (listener != null)
+                    listener.transportFailed("Couldn't install transport: " + ioe.getMessage());
                 }
             }
 
@@ -75,13 +99,30 @@ public class Obfs4Transport implements Transport {
         mPtStateDir = context.getDir("pt-state", Context.MODE_PRIVATE).getAbsolutePath();
 
         mCert = options.getProperty(OPTION_CERT);
+
+        if (options.containsKey(OPTION_IAT_MODE))
+            mIatMode = options.getProperty(OPTION_IAT_MODE);
     }
 
     @Override
     public Connection connect(String addr) {
 
-        mTransportManager.startTransport();
+        mTransportManager.startTransport(new TransportListener() {
+            @Override
+            public void transportStarted(int localPort) {
+                mLocalSocksPort = localPort;
+            }
 
+            @Override
+            public void transportFailed(String err) {
+                Log.d(TAG,"error starting transport: " + err);
+            }
+        });
+
+        while (mLocalSocksPort == -1)
+        {
+            try { Thread.sleep(500);}catch(Exception e){}
+        }
 
         try {
             return new Obfs4Connection(addr, InetAddress.getLocalHost(), mLocalSocksPort);
@@ -91,30 +132,11 @@ public class Obfs4Transport implements Transport {
         }
     }
 
-    private void exec (Runnable run)
-    {
-        new Thread (run).start();
-    }
-
     @Override
     public Listener listen(String addr) {
         return null;
     }
 
-    private void initBinary(Context context) {
-
-
-        /**
-        try {
-            Goptbundle.setenv(DispatchConstants.TOR_PT_LOG_LEVEL, "DEBUG");
-            Goptbundle.setenv(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, "obfs4");
-            Goptbundle.setenv(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
-            Goptbundle.setenv(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0");
-        } catch (Exception e) {
-            Log.e(getClass().getName(), "Error setting env variables", e);
-        }
-        **/
-    }
 
     class Obfs4Connection implements Connection {
 
@@ -134,27 +156,15 @@ public class Obfs4Transport implements Transport {
             mLocalAddress = localSocks;
             mLocalPort = port;
 
-            initBridgeViaSocks();
-
         }
 
         private void initBridgeViaSocks() throws IOException {
             //connect to SOCKS port and pass the values appropriately to configure meek
             //see: https://gitweb.torproject.org/torspec.git/tree/pt-spec.txt#n628
 
-            StringBuffer socksUser = new StringBuffer();
-            socksUser.append(OPTION_CERT).append("\\=").append(mCert).append("\\;");
-
-            StringBuffer socksPass = new StringBuffer();
-            socksPass.append(NUL_CHAR);
-
-            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
-            UserPasswordAuthentication auth = new UserPasswordAuthentication(socksUser.toString(),socksPass.toString());
-            proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
-            SocksSocket s = new SocksSocket(proxy, mRemoteAddress, mRemotePort);
-
-            mInputStream = s.getInputStream();
-            mOutputStream = s.getOutputStream();
+            Socket s = getSocket(mRemoteAddress, mRemotePort);
+            mInputStream = new BufferedInputStream(s.getInputStream());
+            mOutputStream = new BufferedOutputStream(s.getOutputStream());
 
         }
 
@@ -169,6 +179,9 @@ public class Obfs4Transport implements Transport {
          */
         @Override
         public int read(byte[] b, int offset, int length) throws IOException {
+            if (mInputStream == null)
+                initBridgeViaSocks();
+
             return mInputStream.read(b,offset,length);
         }
 
@@ -180,6 +193,10 @@ public class Obfs4Transport implements Transport {
          */
         @Override
         public void write(byte[] b) throws IOException {
+
+            if (mOutputStream == null)
+                initBridgeViaSocks();
+
             mOutputStream.write(b);
             mOutputStream.flush();
         }
@@ -190,11 +207,13 @@ public class Obfs4Transport implements Transport {
         @Override
         public void close() {
 
-            try {
-                mOutputStream.close();
-                mInputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (mOutputStream != null && mInputStream != null) {
+                try {
+                    mOutputStream.close();
+                    mInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -238,5 +257,57 @@ public class Obfs4Transport implements Transport {
         public void setWriteDeadline(Date deadlineTime) {
 
         }
+
+
+        private String getProxyUsername ()
+        {
+            StringBuffer socksUser = new StringBuffer();
+
+            socksUser.append(OPTION_CERT).append("=").append(mCert);
+
+            if (!TextUtils.isEmpty(mIatMode))
+                socksUser.append(";").append(OPTION_IAT_MODE).append("=").append(mIatMode);
+
+            return socksUser.toString();
+        }
+
+        private String getProxyPassword ()
+        {
+            return Character.toString(NUL_CHAR);
+        }
+
+        @Override
+        public Socket getSocket (String remoteAddress, int remotePort) throws SocksException, UnknownHostException {
+
+            Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
+
+            UserPasswordAuthentication auth = new UserPasswordAuthentication(getProxyUsername(),getProxyPassword());
+            proxy.setAuthenticationMethod(0,null);
+            proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
+
+            SocksSocket s = new SocksSocket(proxy, remoteAddress, remotePort);
+
+            return s;
+        }
+    }
+
+    /**
+     * Convenience method to set APT options from Tor style bridge line
+     *
+     * @param options the options instance you want to be configured
+     * @param bridgeLine a configuration line as provided by https://bridges.torproject.org
+     */
+    public static void setPropertiesFromBridgeString (Properties options, String bridgeLine)
+    {
+
+        // obfs4 174.128.247.178:443 818AAAC5F85DE83BF63779E578CA32E5AEC2115E cert=ApWvCPD2uhjeAgaeS4Lem5PudwHLkmeQfEMMGoOkDJqZoeCq9bzLf/q/oGIggvB0b0VObg iat-mode=0
+
+        String[] parts = bridgeLine.split(" ");
+
+        options.put(Obfs4Transport.OPTION_ADDRESS,parts[1]);
+        options.put(Obfs4Transport.OPTION_CERT,parts[3].split("=")[1]);
+        options.put(Obfs4Transport.OPTION_IAT_MODE,parts[4].split("=")[1]);
+
+
     }
 }

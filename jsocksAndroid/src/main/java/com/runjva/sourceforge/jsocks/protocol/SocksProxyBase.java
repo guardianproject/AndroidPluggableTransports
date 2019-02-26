@@ -1,5 +1,8 @@
 package com.runjva.sourceforge.jsocks.protocol;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -344,8 +347,11 @@ public abstract class SocksProxyBase {
 				proxySocket = new SocksSocket(chainProxy, proxyHost, proxyPort);
 			}
 
-			in = proxySocket.getInputStream();
-			out = proxySocket.getOutputStream();
+			if (proxySocket.isConnected()) {
+				out = proxySocket.getOutputStream();
+				in = proxySocket.getInputStream();
+
+			}
 		} catch (final SocksException se) {
 			throw se;
 		} catch (final IOException io_ex) {
