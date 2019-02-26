@@ -190,7 +190,7 @@ class Socks5Message extends ProxyMessage {
 		command = di.readUnsignedByte();
 
 		if (clientMode && (command != 0)) {
-			throw new SocksException(command);
+		//	throw new SocksException(command);
 		}
 
 		di.readUnsignedByte();

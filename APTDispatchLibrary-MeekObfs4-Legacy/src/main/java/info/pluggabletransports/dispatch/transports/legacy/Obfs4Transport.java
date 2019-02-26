@@ -69,13 +69,14 @@ public class Obfs4Transport implements Transport {
 
                     StringBuffer cmd = new StringBuffer();
                     cmd.append(mFileTransport.getCanonicalPath());
+                    cmd.append(" -enableLogging -logLevel DEBUG ");
 
                     HashMap<String,String> env = new HashMap<>();
 
                     env.put(DispatchConstants.TOR_PT_LOG_LEVEL, "DEBUG");
                     env.put(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, DispatchConstants.PT_TRANSPORTS_OBFS4);
                     env.put(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
-                    env.put(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "1");
+                    env.put(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0");
                     env.put(DispatchConstants.TOR_PT_STATE_LOCATION,context.getDir("pt-cache",Context.MODE_PRIVATE).getCanonicalPath());
 
                     exec(cmd.toString(), false, env, listener);
@@ -282,7 +283,7 @@ public class Obfs4Transport implements Transport {
             Socks5Proxy proxy = new Socks5Proxy(mLocalAddress,mLocalPort);
 
             UserPasswordAuthentication auth = new UserPasswordAuthentication(getProxyUsername(),getProxyPassword());
-            proxy.setAuthenticationMethod(0,null);
+          //  proxy.setAuthenticationMethod(0,null);
             proxy.setAuthenticationMethod(UserPasswordAuthentication.METHOD_ID, auth);
 
             SocksSocket s = new SocksSocket(proxy, remoteAddress, remotePort);

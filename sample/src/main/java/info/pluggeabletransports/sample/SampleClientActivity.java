@@ -3,6 +3,7 @@ package info.pluggeabletransports.sample;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -47,8 +48,10 @@ public class SampleClientActivity extends Activity {
 
             protected void onPostExecute(String log) {
                 // Post Code
-                if (log != null)
-                    ((TextView)findViewById(R.id.response)).setText(log);
+                if (log != null) {
+                    Log.d("SAMPLEPT","Result: " + log);
+                    ((TextView) findViewById(R.id.response)).setText(log);
+                }
                 else
                     ((TextView)findViewById(R.id.response)).setText("An error occured");
             }
@@ -106,21 +109,24 @@ public class SampleClientActivity extends Activity {
         options.put(Obfs4Transport.OPTION_ADDRESS,"xxx.xxx.xxx.xxx:1234"); //the host:port where the bridge is running
         options.put(Obfs4Transport.OPTION_CERT,"your obfs4 cert value goes here"); //looks like: ApWvCPD2uhjeAgaeS4Lem5PudwHLkmeQfEMMGoOkDJqZoeCq9bzLf/q/oGIggvB0b0VObg
          **/
+        String address = "72.14.182.23:8888";//"208.80.154.224:80"; //wikipedia!
 
         String torBridgeLine = "obfs4 72.14.182.23:8888 key-not-used cert=x7i6lumoDE5ApW28e8rwqwCwDLhYYYQu8c0ut6vmc9e+P2VV4YQgtN9F+TzSbHJCrD+dLw iat-mode=0";
         Obfs4Transport.setPropertiesFromBridgeString(options,torBridgeLine);
 
         Transport transport = Dispatcher.get().getTransport(this, DispatchConstants.PT_TRANSPORTS_OBFS4, options);
         if (transport != null) {
-
-            Connection ptConn = transport.connect("72.14.182.23:8888");
+            Connection ptConn = transport.connect(address);// transport.connect(options.getProperty(Obfs4Transport.OPTION_ADDRESS));
 
             if (ptConn != null) {
 
                 try {
                     ptConn.write("GET /index.html HTTP/1.0".getBytes());
-                    byte[] resp = new byte[1];
-                    ptConn.read(resp,0,1);
+                    byte[] resp = new byte[1000];
+                    ptConn.read(resp,0,resp.length);
+                    ptConn.close();
+                    String log = new String(resp);
+                    return log;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

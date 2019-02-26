@@ -216,10 +216,6 @@ public class Socks5Proxy extends SocksProxyBase implements Cloneable {
 			final int versionNumber = in.read();
 			selectedMethod = in.read();
 
-			//use default
-			if (selectedMethod == -1)
-			    selectedMethod = authMethods.keys().nextElement().intValue();
-
 			if ((versionNumber < 0) || (selectedMethod < 0)) {
 				// EOF condition was reached
 				endSession();

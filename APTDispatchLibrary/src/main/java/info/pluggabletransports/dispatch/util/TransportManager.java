@@ -10,6 +10,7 @@ import com.jrummyapps.android.shell.Shell;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Map;
@@ -67,51 +68,13 @@ public abstract class TransportManager {
     {
 
         //get system stream
-        exec(new Runnable() {
-            @Override
-            public void run() {
-                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                try {
-
-                    String line = br.readLine();
-
-                    while (line != null) {
-
-                        if (!TextUtils.isEmpty(line))
-                            debug("SYSTEM: " + line);
-
-                        line = br.readLine();
-                    }
-                }
-                catch (IOException e)
-                {
-                    debug("error reading errorstream",e);
-                }
-            }
-        });
+        logStream(System.in);
 
         final Process shellResult = Shell.runWithEnv(cmd, env);
 
         debug("CMD: " + cmd);
 
-        //get erro stream
-        exec(new Runnable() {
-            @Override
-            public void run() {
-                BufferedReader br = new BufferedReader(new InputStreamReader(shellResult.getErrorStream()));
-                String line = null;
-                try {
-                    while (mTransportThread.isAlive()) {
-                        line = br.readLine();
-                        debug("ERROR: " + line);
-                    }
-                }
-                catch (IOException e)
-                {
-                    debug("error reading errorstream",e);
-                }
-            }
-        });
+        logStream(shellResult.getErrorStream());
 
         BufferedReader br = new BufferedReader(new InputStreamReader(shellResult.getInputStream()));
 
@@ -149,4 +112,29 @@ public abstract class TransportManager {
         new Thread (run).start();
     }
 
+    private void logStream (final InputStream is)
+    {
+        exec(new Runnable() {
+            @Override
+            public void run() {
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                try {
+
+                    String line = br.readLine();
+
+                    while (line != null) {
+
+                        if (!TextUtils.isEmpty(line))
+                            debug("SYSTEM: " + line);
+
+                        line = br.readLine();
+                    }
+                }
+                catch (IOException e)
+                {
+                    debug("error reading errorstream",e);
+                }
+            }
+        });
+    }
 }
