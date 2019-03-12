@@ -45,7 +45,7 @@ uploadArchives {
             pom.project {
                 groupId 'info.pluggabletransports.aptds'
                 artifactId 'apt-meek-obfs4'
-                version "1.0.3"
+                version "1.0.4"
             }
         }
     }
