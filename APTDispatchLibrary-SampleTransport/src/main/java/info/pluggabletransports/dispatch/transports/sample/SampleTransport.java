@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Date;
 import java.util.Properties;
 
@@ -37,6 +38,11 @@ public class SampleTransport implements Transport {
     }
 
     class SampleConnection implements Connection {
+
+        @Override
+        public Socket getSocket(String s, int i) throws IOException {
+            return null;
+        }
 
         @Override
         public int read(byte[] b, int offset, int length) throws IOException {
