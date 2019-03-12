@@ -27,7 +27,7 @@ uploadArchives {
             pom.project {
                 groupId 'info.pluggabletransports.aptds'
                 artifactId 'jsocksAndroid'
-                version "1.0.2"
+                version "1.0.4"
             }
         }
     }
