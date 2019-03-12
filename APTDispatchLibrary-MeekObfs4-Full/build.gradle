@@ -26,26 +26,27 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':APTDispatchLibrary')
-    implementation project(path: ':jsocksAndroid')
+   // implementation project(path: ':APTDispatchLibrary')
+   // implementation project(path: ':jsocksAndroid')
 
-   // implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.1'
+    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.4'
+    implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.4'
+
     implementation 'info.pluggabletransports.aptds:goptbundle:1.0.0'
-   // implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.0'
 
 }
 
 apply plugin: 'maven'
 
 uploadArchives {
-    if (hasProperty('aar.deployPath')) {
+    if (project.hasProperty('aar.deployPath')) {
         repositories.mavenDeployer {
             def deployPath = file(getProperty('aar.deployPath'))
             repository(url: "file://${deployPath.absolutePath}")
             pom.project {
                 groupId 'info.pluggabletransports.aptds'
                 artifactId 'apt-meek-obfs4'
-                version "1.0.4"
+                version "1.0.4a"
             }
         }
     }

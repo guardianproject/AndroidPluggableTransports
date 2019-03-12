@@ -33,7 +33,7 @@ dependencies {
 apply plugin: 'maven'
 
 uploadArchives {
-    if (hasProperty('aar.deployPath')) {
+    if (project.hasProperty('aar.deployPath')) {
         repositories.mavenDeployer {
             def deployPath = file(getProperty('aar.deployPath'))
             repository(url: "file://${deployPath.absolutePath}")
