@@ -8,8 +8,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Properties;
 
+import helloproxy.Helloproxy;
 import info.pluggabletransports.dispatch.Connection;
 import info.pluggabletransports.dispatch.DispatchConstants;
 import info.pluggabletransports.dispatch.Dispatcher;
@@ -56,6 +61,21 @@ public class SampleClientActivity extends Activity {
                     ((TextView)findViewById(R.id.response)).setText("An error occured");
             }
         }.execute();
+    }
+
+    private int initUpstreamProxy (int localHttpPort, int ptSocksPort, String username, String password)
+    {
+        StringBuffer socksProxy = new StringBuffer();
+        socksProxy.append("sock5://");
+        socksProxy.append(username);
+        socksProxy.append(':');
+        socksProxy.append(password);
+        socksProxy.append("127.0.0.1:");
+        socksProxy.append(ptSocksPort);
+
+        Helloproxy.startProxy(socksProxy.toString(), ":" + localHttpPort);
+
+        return localHttpPort;
     }
 
     /**
@@ -120,15 +140,41 @@ public class SampleClientActivity extends Activity {
 
             if (ptConn != null) {
 
-                try {
-                    ptConn.write("GET /index.html HTTP/1.0".getBytes());
-                    byte[] resp = new byte[1000];
-                    ptConn.read(resp,0,resp.length);
-                    ptConn.close();
-                    String log = new String(resp);
-                    return log;
-                } catch (IOException e) {
-                    e.printStackTrace();
+                boolean useHttpToSocks5Upstream = true;
+
+                if (useHttpToSocks5Upstream) {
+
+                    String urlString = "https://wikipedia.org";
+
+                    //use this if your Obfs4 bridge is connected to a backend SOCKS5 server
+
+                    int localHttpPort = 8989;
+                    initUpstreamProxy(localHttpPort, ptConn.getLocalPort(), ptConn.getProxyUsername(), ptConn.getProxyPassword());
+
+                    //now here you can make URLConnection requests with HTTP proxy set
+                    Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", localHttpPort));
+                    try {
+                        URLConnection conn = new URL(urlString).openConnection(proxy);
+                        conn.getContent();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    try {
+
+                        //otherwise you can send and receive raw bytes to whatever socket/port your obfs4 is connected to
+
+                        ptConn.write("GET /index.html HTTP/1.0".getBytes());
+                        byte[] resp = new byte[1000];
+                        ptConn.read(resp, 0, resp.length);
+                        ptConn.close();
+                        String log = new String(resp);
+                        return log;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 

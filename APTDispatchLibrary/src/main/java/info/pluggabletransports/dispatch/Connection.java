@@ -28,4 +28,8 @@ public interface Connection {
     public void setReadDeadline(Date deadlineTime);
 
     public void setWriteDeadline(Date deadlineTime);
+
+    public String getProxyUsername ();
+
+    public String getProxyPassword ();
 }

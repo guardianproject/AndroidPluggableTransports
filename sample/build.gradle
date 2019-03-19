@@ -2,6 +2,9 @@ apply plugin: 'com.android.application'
 
 repositories {
     maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 
@@ -50,20 +53,16 @@ android {
 
     }**/
 }
-
 dependencies {
 
+  //  implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.4'
+    //implementation 'info.pluggabletransports.aptds:apt-meek-obfs4-legacy:1.0.4a'
 
-    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.4'
- //   implementation 'info.pluggabletransports.aptds:apt-meek-obfs4-legacy:1.0.4'
-  //  implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.4'
+    implementation project(path: ':APTDispatchLibrary')
+    implementation project(path: ':APTDispatchLibrary-MeekObfs4-Legacy')
 
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
-
-//    implementation project(path: ':APTDispatchLibrary')
- //   implementation project(path: ':APTDispatchLibrary-MeekObfs4-Full')
-    implementation project(path: ':APTDispatchLibrary-MeekObfs4-Legacy')
-
+    implementation (name:'helloproxy', ext:'aar')
 }
