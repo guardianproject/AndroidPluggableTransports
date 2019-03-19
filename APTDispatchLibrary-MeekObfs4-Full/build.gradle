@@ -26,8 +26,6 @@ android {
 }
 
 dependencies {
-   // implementation project(path: ':APTDispatchLibrary')
-   // implementation project(path: ':jsocksAndroid')
 
     implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.4'
     implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.4'
