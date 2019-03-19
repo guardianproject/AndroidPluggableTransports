@@ -1,6 +1,7 @@
 package info.pluggabletransports.dispatch.transports.legacy;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.runjva.sourceforge.jsocks.protocol.Socks5Proxy;
@@ -25,6 +26,7 @@ import info.pluggabletransports.dispatch.util.TransportManager;
 
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
 import static info.pluggabletransports.dispatch.DispatchConstants.TAG;
+import static info.pluggabletransports.dispatch.transports.legacy.Obfs4Transport.OPTION_IAT_MODE;
 
 public class MeekTransport implements Transport {
 
@@ -94,6 +96,7 @@ public class MeekTransport implements Transport {
         mMeekUrl = options.getProperty(OPTION_URL);
     }
 
+
     @Override
     public Connection connect(String addr) {
 
@@ -144,6 +147,9 @@ public class MeekTransport implements Transport {
         private InputStream mInputStream;
         private OutputStream mOutputStream;
 
+
+        private final static char NUL_CHAR = '\u0000';
+
         public MeekConnection(String bridgeAddr, InetAddress localSocks, int port) throws IOException {
 
             String[] addressparts = bridgeAddr.split(":");
@@ -153,6 +159,23 @@ public class MeekTransport implements Transport {
             mLocalPort = port;
 
             initBridgeViaSocks();
+        }
+
+
+        @Override
+        public String getProxyUsername ()
+        {
+            StringBuffer socksUser = new StringBuffer();
+
+            //what do we use here for Meek?
+
+            return socksUser.toString();
+        }
+
+        @Override
+        public String getProxyPassword ()
+        {
+            return Character.toString(NUL_CHAR);
         }
 
         private void initBridgeViaSocks() throws IOException {

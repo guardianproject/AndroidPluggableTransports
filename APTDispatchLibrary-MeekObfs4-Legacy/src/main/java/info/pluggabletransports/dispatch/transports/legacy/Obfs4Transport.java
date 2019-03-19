@@ -259,6 +259,7 @@ public class Obfs4Transport implements Transport {
 
         }
 
+        @Override
         public String getProxyUsername ()
         {
             StringBuffer socksUser = new StringBuffer();
@@ -271,6 +272,7 @@ public class Obfs4Transport implements Transport {
             return socksUser.toString();
         }
 
+        @Override
         public String getProxyPassword ()
         {
             return Character.toString(NUL_CHAR);
