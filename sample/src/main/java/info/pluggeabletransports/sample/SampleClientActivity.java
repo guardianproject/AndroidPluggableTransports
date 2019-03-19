@@ -8,10 +8,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 import helloproxy.Helloproxy;
@@ -63,17 +65,25 @@ public class SampleClientActivity extends Activity {
         }.execute();
     }
 
-    private int initUpstreamProxy (int localHttpPort, int ptSocksPort, String username, String password)
-    {
-        StringBuffer socksProxy = new StringBuffer();
-        socksProxy.append("sock5://");
-        socksProxy.append(username);
-        socksProxy.append(':');
-        socksProxy.append(password);
+    private int initUpstreamProxy (final int localHttpPort, int ptSocksPort, String username, String password) throws UnsupportedEncodingException {
+        final StringBuffer socksProxy = new StringBuffer();
+        socksProxy.append("socks5://");
+        socksProxy.append(URLEncoder.encode(username,"UTF-8"));
+        socksProxy.append(":");
+        socksProxy.append(URLEncoder.encode(password,"UTF-8"));
+        socksProxy.append('@');
         socksProxy.append("127.0.0.1:");
         socksProxy.append(ptSocksPort);
 
-        Helloproxy.startProxy(socksProxy.toString(), ":" + localHttpPort);
+        Log.d("Proxy","proxy" + socksProxy.toString());
+
+        new Thread () {
+            public void run ()
+
+            {
+                Helloproxy.startProxy(":" + localHttpPort, socksProxy.toString());
+            }
+        }.start();
 
         return localHttpPort;
     }
@@ -149,7 +159,11 @@ public class SampleClientActivity extends Activity {
                     //use this if your Obfs4 bridge is connected to a backend SOCKS5 server
 
                     int localHttpPort = 8989;
-                    initUpstreamProxy(localHttpPort, ptConn.getLocalPort(), ptConn.getProxyUsername(), ptConn.getProxyPassword());
+                    try {
+                        initUpstreamProxy(localHttpPort, ptConn.getLocalPort(), ptConn.getProxyUsername(), ptConn.getProxyPassword());
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
 
                     //now here you can make URLConnection requests with HTTP proxy set
                     Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", localHttpPort));
