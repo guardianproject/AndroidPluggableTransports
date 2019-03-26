@@ -22,16 +22,10 @@ public abstract class TransportManager {
 
     public File installTransport (Context context, String assetKey)
     {
-        BinaryInstaller bi = new BinaryInstaller(context,context.getFilesDir());
-
-        String arch = System.getProperty("os.arch");
-        if (arch.contains("x86"))
-            arch = "x86";
-        else
-            arch = "arm";
+        CustomBinaryLibInstaller libInstaller = new CustomBinaryLibInstaller(context, context.getFilesDir());
 
         try {
-            mFileTransport = bi.installResource(arch, assetKey, false);
+            mFileTransport = libInstaller.installResources(assetKey);
         }
         catch (Exception ioe)
         {
