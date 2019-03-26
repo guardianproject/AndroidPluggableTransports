@@ -75,11 +75,10 @@ public class SampleClientActivity extends Activity {
         socksProxy.append("127.0.0.1:");
         socksProxy.append(ptSocksPort);
 
-        Log.d("Proxy","proxy" + socksProxy.toString());
+        Log.d("Proxy","proxy: " + socksProxy.toString());
 
         new Thread () {
             public void run ()
-
             {
                 Helloproxy.startProxy(":" + localHttpPort, socksProxy.toString());
             }
@@ -139,7 +138,7 @@ public class SampleClientActivity extends Activity {
         options.put(Obfs4Transport.OPTION_ADDRESS,"xxx.xxx.xxx.xxx:1234"); //the host:port where the bridge is running
         options.put(Obfs4Transport.OPTION_CERT,"your obfs4 cert value goes here"); //looks like: ApWvCPD2uhjeAgaeS4Lem5PudwHLkmeQfEMMGoOkDJqZoeCq9bzLf/q/oGIggvB0b0VObg
          **/
-        String address = "72.14.182.23:8888";//"208.80.154.224:80"; //wikipedia!
+        String address = "72.14.182.23:8888";
 
         String torBridgeLine = "obfs4 72.14.182.23:8888 key-not-used cert=x7i6lumoDE5ApW28e8rwqwCwDLhYYYQu8c0ut6vmc9e+P2VV4YQgtN9F+TzSbHJCrD+dLw iat-mode=0";
         Obfs4Transport.setPropertiesFromBridgeString(options,torBridgeLine);
