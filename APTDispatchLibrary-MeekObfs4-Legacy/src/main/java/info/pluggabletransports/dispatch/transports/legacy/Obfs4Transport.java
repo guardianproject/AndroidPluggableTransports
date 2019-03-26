@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 
-import com.runjva.sourceforge.jsocks.protocol.Socks4Proxy;
 import com.runjva.sourceforge.jsocks.protocol.Socks5Proxy;
 import com.runjva.sourceforge.jsocks.protocol.SocksException;
 import com.runjva.sourceforge.jsocks.protocol.SocksSocket;
@@ -21,7 +20,6 @@ import info.pluggabletransports.dispatch.util.TransportManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
-import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_MEEK;
 import static info.pluggabletransports.dispatch.DispatchConstants.PT_TRANSPORTS_OBFS4;
 import static info.pluggabletransports.dispatch.DispatchConstants.TAG;
 
@@ -67,20 +64,28 @@ public class Obfs4Transport implements Transport {
                 try {
 
 
-                    StringBuffer cmd = new StringBuffer();
-                    cmd.append(mFileTransport.getCanonicalPath());
-                    cmd.append(" -enableLogging -logLevel DEBUG ");
+                    if (mFileTransport != null && mFileTransport.exists() && mFileTransport.canExecute()) {
+                        StringBuffer cmd = new StringBuffer();
+                        cmd.append(mFileTransport.getCanonicalPath());
+                        cmd.append(" -enableLogging -logLevel DEBUG ");
 
-                    HashMap<String,String> env = new HashMap<>();
+                        HashMap<String, String> env = new HashMap<>();
 
-                    env.put(DispatchConstants.TOR_PT_LOG_LEVEL, "DEBUG");
-                    env.put(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, DispatchConstants.PT_TRANSPORTS_OBFS4);
-                    env.put(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
-                    env.put(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0");
-                    env.put(DispatchConstants.TOR_PT_STATE_LOCATION,context.getDir("pt-cache",Context.MODE_PRIVATE).getCanonicalPath());
+                        env.put(DispatchConstants.TOR_PT_LOG_LEVEL, "DEBUG");
+                        env.put(DispatchConstants.TOR_PT_CLIENT_TRANSPORTS, DispatchConstants.PT_TRANSPORTS_OBFS4);
+                        env.put(DispatchConstants.TOR_PT_MANAGED_TRANSPORT_VER, "1");
+                        env.put(DispatchConstants.TOR_PT_EXIT_ON_STDIN_CLOSE, "0");
+                        env.put(DispatchConstants.TOR_PT_STATE_LOCATION, context.getDir("pt-cache", Context.MODE_PRIVATE).getCanonicalPath());
 
-                    exec(cmd.toString(), false, env, listener);
+                        exec(cmd.toString(), false, env, listener);
+                    }
+                    else
+                    {
+                        debug("Couldn't install or execute transport: " + mFileTransport);
 
+                        if (listener != null)
+                            listener.transportFailed("Couldn't install or execute transport: " + mFileTransport);
+                    }
 
 
                 }
@@ -96,7 +101,7 @@ public class Obfs4Transport implements Transport {
         };
 
         mTransportManager.installTransport(context, ASSET_KEY);
-
+        
         mPtStateDir = context.getDir("pt-state", Context.MODE_PRIVATE).getAbsolutePath();
 
         mCert = options.getProperty(OPTION_CERT);

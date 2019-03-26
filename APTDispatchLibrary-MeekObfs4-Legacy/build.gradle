@@ -27,8 +27,12 @@ android {
 
 dependencies {
 
-    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.5'
+    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.6'
     implementation 'info.pluggabletransports.aptds:jsocksAndroid:1.0.4'
+
+    //implementation project (":APTDispatchLibrary")
+    //implementation project (":jsocksAndroid")
+
 
 }
 
@@ -42,7 +46,7 @@ uploadArchives {
            pom.project {
                groupId 'info.pluggabletransports.aptds'
                artifactId 'apt-meek-obfs4-legacy'
-               version "1.0.5"
+               version "1.0.6"
            }
        }
    }
