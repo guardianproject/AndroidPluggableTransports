@@ -87,7 +87,7 @@ public class SnowflakeTransport implements Transport {
         exec(new Runnable() { public void run () { Goptbundle.load(mPtStateDir); } });
         exec(new Runnable() { public void run () {
 
-            String line = getLogLine("CMETHOD obfs4 socks5",1000);
+            String line = getLogLine("CMETHOD snowflake socks5",1000);
             //         CMETHOD trebuchet socks5 127.0.0.1:19999
 
             if (!TextUtils.isEmpty(line))
