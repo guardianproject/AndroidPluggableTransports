@@ -80,7 +80,7 @@ public class CustomBinaryLibInstaller {
         //let's try another approach
         fileBinary = new File(installFolder, binaryName);
         //fileTor = NativeLoader.initNativeLibs(context,fileTor);
-        CustomNativeLoader.initNativeLibs(context,fileBinary);
+        CustomNativeLoader.initNativeLibs(context,fileBinary, binaryName);
 
         setExecutable(fileBinary);
 

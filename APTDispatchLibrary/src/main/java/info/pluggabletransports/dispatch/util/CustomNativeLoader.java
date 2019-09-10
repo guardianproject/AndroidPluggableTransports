@@ -13,12 +13,9 @@ import java.util.zip.ZipFile;
 
 public class CustomNativeLoader {
 
-    private final static String LIB_NAME = "tor";
-    private final static String LIB_SO_NAME = "tor.so";
-
     private final static String TAG = "TorNativeLoader";
 
-    private static boolean loadFromZip(Context context, File destLocalFile, String arch) {
+    private static boolean loadFromZip(Context context, File destLocalFile, String arch, String lib) {
 
 
         ZipFile zipFile = null;
@@ -26,9 +23,9 @@ public class CustomNativeLoader {
 
         try {
             zipFile = new ZipFile(context.getApplicationInfo().sourceDir);
-            ZipEntry entry = zipFile.getEntry("lib/" + arch + "/" + LIB_SO_NAME);
+            ZipEntry entry = zipFile.getEntry("lib/" + arch + "/" + lib + ".so");
             if (entry == null) {
-                throw new Exception("Unable to find file in apk:" + "lib/" + arch + "/" + LIB_NAME);
+                throw new Exception("Unable to find file in apk:" + "lib/" + arch + "/" + lib + ".so");
             }
 
             //how we wrap this in another stream because the native .so is zipped itself
@@ -71,43 +68,10 @@ public class CustomNativeLoader {
         return false;
     }
 
-    public static synchronized File initNativeLibs(Context context, File destLocalFile) {
+    public static synchronized File initNativeLibs(Context context, File destLocalFile, String lib) {
 
         try {
             String folder = Build.CPU_ABI;
-
-            /**
-             try {
-
-             if (Build.CPU_ABI.equalsIgnoreCase("arm64-v8a")) {
-             folder = "arm64-v8a";
-             }
-             else if (Build.CPU_ABI.equalsIgnoreCase("arm64")) {
-             folder = "arm64";
-             }
-             else if (Build.CPU_ABI.equalsIgnoreCase("x86_64")) {
-             folder = "x86_64";
-             }
-             else if (Build.CPU_ABI.equalsIgnoreCase("armeabi-v7a")) {
-             folder = "armeabi-v7a";
-             }
-             else if (Build.CPU_ABI.equalsIgnoreCase("armeabi")) {
-             folder = "armeabi";
-             } else if (Build.CPU_ABI.equalsIgnoreCase("x86")) {
-             folder = "x86";
-             } else if (Build.CPU_ABI.equalsIgnoreCase("mips")) {
-             folder = "mips";
-             } else {
-             folder = "armeabi";
-             //FileLog.e("tmessages", "Unsupported arch: " + Build.CPU_ABI);
-             }
-
-             } catch (Exception e) {
-             //  FileLog.e("tmessages", e);
-             Log.e(TAG, e.getMessage(),e);
-             folder = "armeabi";
-             }**/
-
 
             String javaArch = System.getProperty("os.arch");
             if (javaArch != null && javaArch.contains("686")) {
@@ -115,7 +79,7 @@ public class CustomNativeLoader {
             }
 
 
-            if (loadFromZip(context, destLocalFile, folder)) {
+            if (loadFromZip(context, destLocalFile, folder, lib)) {
                 return destLocalFile;
             }
 
