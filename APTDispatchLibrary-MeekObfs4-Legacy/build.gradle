@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 105
-        versionName "1.0.7"
+        versionCode 108
+        versionName "1.0.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -46,7 +46,7 @@ uploadArchives {
            pom.project {
                groupId 'info.pluggabletransports.aptds'
                artifactId 'apt-meek-obfs4-legacy'
-               version "1.0.7"
+               version "1.0.8"
            }
        }
    }
