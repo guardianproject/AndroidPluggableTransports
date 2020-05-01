@@ -54,6 +54,8 @@ public class CustomBinaryLibInstaller {
 
         File fileNativeDir = new File(getNativeLibraryDir(context));
         fileBinary = new File(fileNativeDir,binaryName + ".so");
+        if (!fileBinary.exists())
+            fileBinary = new File(fileNativeDir,"lib" + binaryName + ".so");
 
         if (fileBinary.exists())
         {
@@ -68,17 +70,11 @@ public class CustomBinaryLibInstaller {
             }
         }
 
-        if (fileBinary.exists()) {
-            InputStream is = new FileInputStream(fileBinary);
-            streamToFile(is, fileBinary, false, true);
-            setExecutable(fileBinary);
-
-            if (fileBinary.exists() && fileBinary.canExecute())
-                return fileBinary;
-        }
-
         //let's try another approach
         fileBinary = new File(installFolder, binaryName);
+        if (!fileBinary.exists())
+            fileBinary = new File(fileNativeDir,"lib" + binaryName + ".so");
+
         //fileTor = NativeLoader.initNativeLibs(context,fileTor);
         CustomNativeLoader.initNativeLibs(context,fileBinary, binaryName);
 

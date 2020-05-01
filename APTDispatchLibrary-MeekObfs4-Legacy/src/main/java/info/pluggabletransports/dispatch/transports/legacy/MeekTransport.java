@@ -44,7 +44,7 @@ public class MeekTransport implements Transport {
     private final static String NUL_CHAR = "\u0000";
 
     private TransportManager mTransportManager;
-    private final static String ASSET_KEY = "obfs4";
+    private final static String ASSET_KEY = "obfs4proxy";
 
     @Override
     public void register() {

@@ -54,11 +54,11 @@ android {
 }
 dependencies {
 
-    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.6'
-    implementation 'info.pluggabletransports.aptds:apt-meek-obfs4-legacy:1.0.6'
+//    implementation 'info.pluggabletransports.aptds:apt-dispatch-library:1.0.6'
+ //   implementation 'info.pluggabletransports.aptds:apt-meek-obfs4-legacy:1.0.6'
 
-    //implementation project (":APTDispatchLibrary")
-    //implementation project (":APTDispatchLibrary-MeekObfs4-Legacy")
+    implementation project (":APTDispatchLibrary")
+    implementation project (":APTDispatchLibrary-MeekObfs4-Legacy")
 
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'

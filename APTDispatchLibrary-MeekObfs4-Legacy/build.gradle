@@ -5,13 +5,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 108
-        versionName "1.0.8"
+        targetSdkVersion 29
+        versionCode 109
+        versionName "1.0.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
